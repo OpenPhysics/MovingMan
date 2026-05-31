@@ -16,11 +16,11 @@ const MovingManConstants = {
   // Longest stretch of motion that the Charts screen records / plays back, in seconds.
   MAX_TIME: 20,
 
-  // The model advances on a fixed internal timestep. The original derivative workaround
-  // notes a "dt*2 = 80 ms" centering error, i.e. dt = 40 ms (25 fps). Every derivative /
-  // integration step is calibrated around this dt, so we substep instead of using the
-  // (variable) real frame dt.
-  FIXED_DT: 0.04,
+  // The model advances on a fixed internal timestep, matching the Java original's clock
+  // of 24 fps (dt = 1/24 s ≈ 41.7 ms; the centered-derivative readouts lag by ~2*dt ≈
+  // 83 ms). Every derivative / integration step is calibrated around this dt, so we
+  // substep instead of using the (variable) real frame dt.
+  FIXED_DT: 1 / 24,
   MAX_CATCHUP_STEPS: 10,
 
   // ── Derivative / sampling tuning (from PhET) ─────────────────────────────────
