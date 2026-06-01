@@ -59,6 +59,8 @@ export type PlayAreaNodeOptions = {
   height: number;
   /** Set true to use a smaller man and a more compact clock layout (Charts screen). */
   compact?: boolean;
+  /** Override the man's height in px (defaults to 150 full-size, 66 compact). */
+  manHeight?: number;
 };
 
 export class PlayAreaNode extends Node {
@@ -67,7 +69,7 @@ export class PlayAreaNode extends Node {
   public constructor(model: MovingManModel, options: PlayAreaNodeOptions) {
     super();
 
-    const { width, height, compact = false } = options;
+    const { width, height, compact = false, manHeight: manHeightOverride } = options;
 
     // Reserve a margin so the ±10 m ends — and the brick walls and the man at them —
     // sit inside the play area rather than flush against its clipped edges.
@@ -140,7 +142,7 @@ export class PlayAreaNode extends Node {
     // is shorter and his velocity/acceleration arrows use tighter gaps, so the stacked
     // arrows above his head still fit inside the short play area instead of being clipped
     // off the top.
-    const manHeight = compact ? 66 : 150;
+    const manHeight = manHeightOverride ?? (compact ? 66 : 150);
     const man = new MovingManSpriteNode(model, {
       transform,
       feetY: groundLineY,

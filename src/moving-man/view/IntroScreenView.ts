@@ -1,15 +1,16 @@
 /**
  * IntroScreenView.ts
  *
- * The "Introduction" screen. A play area with the man, walls, and ruler on top; a row
- * of three quantity controls (Position, Velocity, Acceleration) below; a small Walls
- * checkbox; play/pause + Reset All controls bottom-right.
+ * The "Introduction" screen. A play area with the man, walls, and ruler on top; a vertical
+ * stack of three quantity controls (Position, Velocity, Acceleration) below, each with its
+ * vector checkbox to the right; a small Walls checkbox; play/pause + Reset All controls
+ * bottom-right.
  *
  * No recording / playback chrome — that's reserved for the Charts screen, matching the
  * original sim's simplification of the Intro tab (see Deviations.md in the source).
  */
 
-import { HBox, Node } from "scenerystack/scenery";
+import { AlignGroup, Node, VBox } from "scenerystack/scenery";
 import { PlayPauseButton, ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
 import type { Tandem } from "scenerystack/tandem";
@@ -23,7 +24,10 @@ import { WallsCheckbox } from "./WallsCheckbox.js";
 
 const MARGIN = 14;
 const PLAY_AREA_WIDTH = 980;
-const PLAY_AREA_HEIGHT = 384;
+// Shorter than the original (less sky/ground) so the three quantity controls can stack
+// vertically below it; the man is scaled down to match so his arrows still clear the top.
+const PLAY_AREA_HEIGHT = 300;
+const MAN_HEIGHT = 120;
 const CONTROL_SLIDER_WIDTH = 240;
 const PLAY_PAUSE_RADIUS = 28;
 
@@ -37,27 +41,34 @@ export class IntroScreenView extends ScreenView {
 
     addCollisionSounds(model.movingMan.collideEmitter);
 
-    const playArea = new PlayAreaNode(model, { width: PLAY_AREA_WIDTH, height: PLAY_AREA_HEIGHT });
-
-    const positionControl = new VariableControl(model, {
-      kind: "position",
-      range: MovingManConstants.POSITION_RANGE,
-      sliderWidth: CONTROL_SLIDER_WIDTH,
-    });
-    const velocityControl = new VariableControl(model, {
-      kind: "velocity",
-      range: MovingManConstants.VELOCITY_RANGE,
-      sliderWidth: CONTROL_SLIDER_WIDTH,
-    });
-    const accelerationControl = new VariableControl(model, {
-      kind: "acceleration",
-      range: MovingManConstants.ACCELERATION_RANGE,
-      sliderWidth: CONTROL_SLIDER_WIDTH,
+    const playArea = new PlayAreaNode(model, {
+      width: PLAY_AREA_WIDTH,
+      height: PLAY_AREA_HEIGHT,
+      manHeight: MAN_HEIGHT,
     });
 
-    const controlsRow = new HBox({
-      spacing: 18,
-      align: "top",
+    // Pads each control panel to a shared width (left-aligned) so the stacked sliders line up
+    // and the vector checkboxes share a right-hand column.
+    const controlsAlignGroup = new AlignGroup({ matchVertical: false });
+    const makeControl = (
+      kind: "position" | "velocity" | "acceleration",
+      range: typeof MovingManConstants.POSITION_RANGE,
+    ) =>
+      new VariableControl(model, {
+        kind,
+        range,
+        sliderWidth: CONTROL_SLIDER_WIDTH,
+        vectorCheckboxPlacement: "right",
+        contentAlignGroup: controlsAlignGroup,
+      });
+
+    const positionControl = makeControl("position", MovingManConstants.POSITION_RANGE);
+    const velocityControl = makeControl("velocity", MovingManConstants.VELOCITY_RANGE);
+    const accelerationControl = makeControl("acceleration", MovingManConstants.ACCELERATION_RANGE);
+
+    const controlsColumn = new VBox({
+      spacing: 10,
+      align: "center",
       children: [positionControl, velocityControl, accelerationControl],
     });
 
@@ -86,8 +97,8 @@ export class IntroScreenView extends ScreenView {
     wallsCheckbox.right = playArea.right - 10;
     wallsCheckbox.top = playArea.top + 10;
 
-    controlsRow.centerX = layoutBounds.centerX;
-    controlsRow.top = playArea.bottom + 20;
+    controlsColumn.centerX = layoutBounds.centerX;
+    controlsColumn.top = playArea.bottom + 16;
 
     // Preset position-function chooser, bottom-left.
     functionComboBox.left = layoutBounds.minX + MARGIN;
@@ -102,7 +113,7 @@ export class IntroScreenView extends ScreenView {
     this.children = [
       playArea,
       wallsCheckbox,
-      controlsRow,
+      controlsColumn,
       functionComboBox,
       playPauseButton,
       resetAllButton,

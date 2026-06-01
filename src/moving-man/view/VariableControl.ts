@@ -14,7 +14,7 @@
 import type { Property, TReadOnlyProperty } from "scenerystack/axon";
 import { BooleanProperty, NumberProperty, StringProperty } from "scenerystack/axon";
 import { Dimension2, type Range } from "scenerystack/dot";
-import { type Node, type TColor, Text, VBox, VStrut } from "scenerystack/scenery";
+import { type AlignGroup, HBox, type Node, type TColor, Text, VBox, VStrut } from "scenerystack/scenery";
 import { NumberControl, PhetFont } from "scenerystack/scenery-phet";
 import { Checkbox, Panel } from "scenerystack/sun";
 import { StringManager } from "../../i18n/StringManager.js";
@@ -30,9 +30,13 @@ const PANEL_CORNER_RADIUS = 6;
 const PANEL_X_MARGIN = 8;
 const PANEL_Y_MARGIN = 6;
 const PANEL_VSPACING = 4;
+const PANEL_HSPACING = 10;
 const NUMBER_CONTROL_DELTA = 0.1;
 
 export type VariableControlKind = "position" | "velocity" | "acceleration";
+
+/** Where the vector-visibility checkbox sits relative to the slider. */
+export type VectorCheckboxPlacement = "below" | "right";
 
 export type VariableControlOptions = {
   kind: VariableControlKind;
@@ -41,11 +45,28 @@ export type VariableControlOptions = {
   sliderWidth?: number;
   /** Decimal places shown in the read-out. */
   decimalPlaces?: number;
+  /**
+   * Where the vector-visibility checkbox sits. "below" (default) keeps the panel narrow for
+   * a horizontal row of controls; "right" keeps it short for a vertical stack of controls.
+   */
+  vectorCheckboxPlacement?: VectorCheckboxPlacement;
+  /**
+   * Optional group that pads each panel's content to a common size (left-aligned) so a stack
+   * of panels shares one width and their sliders line up. Share one instance across the stack.
+   */
+  contentAlignGroup?: AlignGroup;
 };
 
 export class VariableControl extends Panel {
   public constructor(model: MovingManModel, options: VariableControlOptions) {
-    const { kind, range, sliderWidth = 240, decimalPlaces = 2 } = options;
+    const {
+      kind,
+      range,
+      sliderWidth = 240,
+      decimalPlaces = 2,
+      vectorCheckboxPlacement = "below",
+      contentAlignGroup,
+    } = options;
     const bundle = VariableControl.resolveBundle(model, kind);
 
     const titleText = new Text("", { font: TITLE_FONT_NORMAL, fill: bundle.color });
@@ -112,18 +133,33 @@ export class VariableControl extends Panel {
       });
     }
 
-    const children: Node[] = [numberControl];
-    if (bundle.vectorVisibleProperty && bundle.vectorLabelStringProperty) {
-      children.push(VariableControl.makeVectorCheckbox(bundle.vectorVisibleProperty, bundle.vectorLabelStringProperty));
+    const checkbox =
+      bundle.vectorVisibleProperty && bundle.vectorLabelStringProperty
+        ? VariableControl.makeVectorCheckbox(bundle.vectorVisibleProperty, bundle.vectorLabelStringProperty)
+        : null;
+
+    let content: Node;
+    if (vectorCheckboxPlacement === "right") {
+      // Checkbox to the right of the slider, so a vertical stack of panels stays short.
+      // Position has no checkbox; the align group (if any) pads it out to the shared width.
+      content = new HBox({
+        align: "center",
+        spacing: PANEL_HSPACING,
+        children: checkbox ? [numberControl, checkbox] : [numberControl],
+      });
     } else {
-      // Reserve the height of a vector-checkbox row so every quantity panel is the same
-      // height whether or not it has a checkbox (Position has none).
-      children.push(new VStrut(VariableControl.vectorCheckboxHeight()));
+      // Checkbox below the slider. Position reserves the checkbox-row height so every panel
+      // in a horizontal row is the same height whether or not it has a checkbox.
+      content = new VBox({
+        align: "center",
+        spacing: PANEL_VSPACING,
+        children: [numberControl, checkbox ?? new VStrut(VariableControl.vectorCheckboxHeight())],
+      });
     }
 
-    const content = new VBox({ align: "center", spacing: PANEL_VSPACING, children });
+    const panelContent: Node = contentAlignGroup ? contentAlignGroup.createBox(content, { xAlign: "left" }) : content;
 
-    super(content, {
+    super(panelContent, {
       fill: MovingManColors.panelFillProperty,
       stroke: MovingManColors.panelStrokeProperty,
       cornerRadius: PANEL_CORNER_RADIUS,
