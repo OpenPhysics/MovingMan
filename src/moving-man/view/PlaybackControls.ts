@@ -18,7 +18,8 @@ import type { MovingManModel } from "../model/MovingManModel.js";
 
 const LABEL_FONT = new PhetFont(13);
 
-const RADIO_BUTTON_SPACING = 12;
+// Matches TimeSpeedRadioButtonGroup's vertical spacing so the two stacked groups line up.
+const RADIO_BUTTON_SPACING = 9;
 const RADIO_BUTTON_RADIUS = 8;
 const TRANSPORT_BUTTON_RADIUS = 16;
 const PLAY_PAUSE_BUTTON_RADIUS = 20;
@@ -78,7 +79,7 @@ export class PlaybackControls extends HBox {
         { value: false, createNode: () => labelText(playback.playbackStringProperty) },
       ],
       {
-        orientation: "horizontal",
+        orientation: "vertical",
         spacing: RADIO_BUTTON_SPACING,
         radioButtonOptions: { radius: RADIO_BUTTON_RADIUS, stroke: MovingManColors.foregroundColorProperty },
       },
@@ -102,7 +103,7 @@ export class PlaybackControls extends HBox {
     // Standard play/pause + step + speed radio (handles grouping and spacing for us).
     const timeControlNode = new TimeControlNode(model.isPlayingProperty, {
       timeSpeedProperty,
-      timeSpeeds: [TimeSpeed.FAST, TimeSpeed.NORMAL, TimeSpeed.SLOW],
+      timeSpeeds: [TimeSpeed.SLOW, TimeSpeed.NORMAL, TimeSpeed.FAST],
       flowBoxSpacing: 16,
       playPauseStepButtonOptions: {
         playPauseStepXSpacing: TRANSPORT_SPACING,
