@@ -1,9 +1,8 @@
 # Moving Man
 
 A [SceneryStack](https://scenerystack.org) port of the **Moving Man** simulation.
-Originally a PhET Java sim, then an HTML5 / Backbone port at
-`simulations/moving-man`; this version rebuilds it in TypeScript on top of
-SceneryStack, in the same architectural style as the LadyBug and RadioWaves ports.
+Originally a PhET Java sim, this version rebuilds it in TypeScript on top of
+SceneryStack, in the same architectural style.
 
 ## Screens
 
