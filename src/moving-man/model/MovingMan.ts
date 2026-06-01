@@ -75,7 +75,6 @@ export class MovingMan {
   private time = 0;
   private times: number[] = [];
   private mousePosition = 0;
-  private readonly wallResult: WallResult = { position: 0, collided: false };
 
   public constructor(context: ManContext, noRecording: boolean) {
     this.context = context;
@@ -201,6 +200,9 @@ export class MovingMan {
     const previousPosition = this.positionProperty.value;
 
     const position = this.clampIfWalled(preset.evaluate(time)).position;
+    // Feed the pointer-average window too, so dragging the man away from a running
+    // preset hands control back smoothly (matches the original's expression branch).
+    this.mouseDataSeries.add(position, time);
     this.positionModelSeries.add(position, time);
 
     // Differentiate position → velocity → acceleration.
@@ -304,10 +306,16 @@ export class MovingMan {
 
     // A deceleration spike when crashing into a wall: switch to velocity-driven and
     // rerun the step so the wall stops the man rather than the acceleration carrying on.
+    // Replay at the SAME time: the Java original rolls time back by dt and then re-adds
+    // it inside its step method, so the replayed frame lands on the original time. Our
+    // update() sets time directly (it doesn't re-add dt), so we must pass `time`, not
+    // `time - delta`. Passing `time - delta` (as the PIXI port did) duplicates the
+    // previous frame's timestamp and skips this one, leaving a backtrack/kink on the
+    // charts and a one-frame desync from the recorded history at the crash.
     if (wallResult.collided) {
       this.setVelocityDriven();
       this.velocityProperty.value = newVelocity;
-      this.update(time - delta, delta);
+      this.update(time, delta);
       return;
     }
 
@@ -346,22 +354,26 @@ export class MovingMan {
 
   // ── Walls ─────────────────────────────────────────────────────────────────────
 
-  /** Clamp x to the walls (if enabled), reporting whether a collision occurred. */
+  /**
+   * Clamp x to the walls (if enabled), reporting whether a collision occurred.
+   *
+   * Returns a FRESH result object every call (as the Java original's `new WallResult`
+   * does). It must not be a shared/reused instance: callers hold the returned object
+   * across a later `setMousePosition()`, which itself calls `clampIfWalled` — a shared
+   * object would get its `collided` flag clobbered before the caller reads it, so a
+   * velocity-mode wall hit would fail to zero the velocity or fire the collision.
+   */
   public clampIfWalled(x: number): WallResult {
-    this.wallResult.position = x;
-    this.wallResult.collided = false;
-
     if (this.context.wallsEnabled) {
       const half = this.context.halfContainerWidth;
       if (x < -half) {
-        this.wallResult.position = -half;
-        this.wallResult.collided = true;
-      } else if (x > half) {
-        this.wallResult.position = half;
-        this.wallResult.collided = true;
+        return { position: -half, collided: true };
+      }
+      if (x > half) {
+        return { position: half, collided: true };
       }
     }
-    return this.wallResult;
+    return { position: x, collided: false };
   }
 
   private hitsWall(x: number): boolean {
