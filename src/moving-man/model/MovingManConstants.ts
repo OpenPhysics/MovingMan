@@ -17,23 +17,32 @@ const MovingManConstants = {
   MAX_TIME: 20,
 
   // The model advances on a fixed internal timestep, matching the Java original's clock
-  // of 24 fps (dt = 1/24 s ≈ 41.7 ms; the centered-derivative readouts lag by ~2*dt ≈
-  // 83 ms). Every derivative / integration step is calibrated around this dt, so we
-  // substep instead of using the (variable) real frame dt.
+  // of 24 fps (dt = 1/24 s ≈ 41.7 ms). Every derivative / integration step is calibrated
+  // around this dt, so we substep instead of using the (variable) real frame dt.
   FIXED_DT: 1 / 24,
   MAX_CATCHUP_STEPS: 10,
 
-  // ── Derivative / sampling tuning (from PhET) ─────────────────────────────────
-  // Number of recent mouse samples averaged to smooth pointer-driven position.
+  // ── Derivative / sampling tuning ─────────────────────────────────────────────
+  // Number of recent mouse samples averaged to smooth pointer-driven position. Kept small
+  // so the man tracks the pointer closely (no laggy "rubber-banding").
   NUMBER_MOUSE_POINTS_TO_AVERAGE: 4,
-  // Half-window of the centered least-squares derivative.
-  DERIVATIVE_RADIUS: 1,
-  // Fixed-size queues used to compute centered derivatives.
-  SERIES_SIZE_LIMIT: 6,
+  // Half-window of the centered least-squares derivative. Widened from PhET's 1 to 3: a
+  // 7-point regression rejects the high-frequency noise that double-differentiating a
+  // hand-dragged position otherwise dumps into the acceleration, without faking the value
+  // (it is still a real least-squares slope). The trade-off is lag: each readout is sampled
+  // at its most-recent *fully centered* point — DERIVATIVE_RADIUS steps back for velocity,
+  // twice that for acceleration — so acceleration lags by ~2*RADIUS*dt ≈ 250 ms. Lower it
+  // for a snappier (but jitterier) acceleration; 1 restores exact PhET parity.
+  DERIVATIVE_RADIUS: 3,
+  // Fixed-size queues used to compute centered derivatives. Must hold at least 4*RADIUS+1
+  // points so the acceleration sample (read 2*RADIUS steps back) still has a full symmetric
+  // window on both sides.
+  SERIES_SIZE_LIMIT: 13,
   // Time-limited graph series only retain points up to MAX_TIME seconds.
   SERIES_TIME_LIMIT: 20,
   // How many recent frame times the man remembers (for the centered-derivative lookup).
-  NUM_TIME_POINTS_TO_RECORD: 10,
+  // Must exceed 2*DERIVATIVE_RADIUS so the acceleration sample time can be looked up.
+  NUM_TIME_POINTS_TO_RECORD: 12,
 
   // ── View arrow scaling (from PhET; tuned so the arrows read well on screen) ───
   VELOCITY_SCALE: 0.2,

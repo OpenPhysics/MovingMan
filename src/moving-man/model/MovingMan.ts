@@ -209,12 +209,14 @@ export class MovingMan {
     this.velocityModelSeries.setData(this.estimatedCenteredDerivatives(this.positionModelSeries));
     this.accelerationModelSeries.setData(this.estimatedCenteredDerivatives(this.velocityModelSeries));
 
-    const time1StepsAgo = this.getTimeNTimeStepsAgo(1);
-    const time2StepsAgo = this.getTimeNTimeStepsAgo(2);
+    const velocitySampleTime = this.getTimeNTimeStepsAgo(DERIVATIVE_RADIUS);
+    const accelerationSampleTime = this.getTimeNTimeStepsAgo(2 * DERIVATIVE_RADIUS);
 
     this.positionGraphSeries.add(position, time);
-    this.velocityGraphSeries.addPoint(this.getPointAtTime(this.velocityModelSeries, time1StepsAgo, time));
-    this.accelerationGraphSeries.addPoint(this.getPointAtTime(this.accelerationModelSeries, time2StepsAgo, time));
+    this.velocityGraphSeries.addPoint(this.getPointAtTime(this.velocityModelSeries, velocitySampleTime, time));
+    this.accelerationGraphSeries.addPoint(
+      this.getPointAtTime(this.accelerationModelSeries, accelerationSampleTime, time),
+    );
 
     this.positionProperty.value = position;
     this.velocityProperty.value = this.snapToZero(this.velocityGraphSeries.getLastPoint()?.value ?? 0);
@@ -249,15 +251,19 @@ export class MovingMan {
     this.velocityModelSeries.setData(this.estimatedCenteredDerivatives(this.positionModelSeries));
     this.accelerationModelSeries.setData(this.estimatedCenteredDerivatives(this.velocityModelSeries));
 
-    // We read midpoints from the sampling windows to obtain centered derivatives.
-    // Per PhET, this makes the readouts lag by up to 2*dt; the reported time is
-    // substituted so the graphs still line up with the current time.
-    const time1StepsAgo = this.getTimeNTimeStepsAgo(1);
-    const time2StepsAgo = this.getTimeNTimeStepsAgo(2);
+    // Read each derivative at its most-recent *fully centered* sample, where the
+    // least-squares window is symmetric (and so smoothest / least jittery): velocity
+    // DERIVATIVE_RADIUS steps back, acceleration twice that. The values are restamped with
+    // the current time so the graphs still line up with "now"; the cost is a readout lag of
+    // ~2*RADIUS*dt on acceleration. See DERIVATIVE_RADIUS in MovingManConstants.
+    const velocitySampleTime = this.getTimeNTimeStepsAgo(DERIVATIVE_RADIUS);
+    const accelerationSampleTime = this.getTimeNTimeStepsAgo(2 * DERIVATIVE_RADIUS);
 
     this.positionGraphSeries.add(position, time);
-    this.velocityGraphSeries.addPoint(this.getPointAtTime(this.velocityModelSeries, time1StepsAgo, time));
-    this.accelerationGraphSeries.addPoint(this.getPointAtTime(this.accelerationModelSeries, time2StepsAgo, time));
+    this.velocityGraphSeries.addPoint(this.getPointAtTime(this.velocityModelSeries, velocitySampleTime, time));
+    this.accelerationGraphSeries.addPoint(
+      this.getPointAtTime(this.accelerationModelSeries, accelerationSampleTime, time),
+    );
 
     this.positionProperty.value = position;
     this.velocityProperty.value = this.snapToZero(this.velocityGraphSeries.getLastPoint()?.value ?? 0);
