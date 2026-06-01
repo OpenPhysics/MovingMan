@@ -11,6 +11,7 @@
  * and reactive behaviour (position tracking, facing direction, arrow overlays, drag).
  */
 
+import { Matrix3 } from "scenerystack/dot";
 import { Shape } from "scenerystack/kite";
 import { DragListener, Image, Node, Path } from "scenerystack/scenery";
 import { ArrowNode } from "scenerystack/scenery-phet";
@@ -91,9 +92,11 @@ export class MovingManSpriteNode extends Node {
     }
     walking.visible = false;
 
-    // The figure (frames only) lives in its own child so it can be mirrored, bobbed and
-    // tilted without disturbing the shadow or the arrows.
-    const figure = new Node({ children: [standing, walking] });
+    // The frames live in a dedicated "flipper" child that carries only the horizontal
+    // mirror (set as an absolute, idempotent matrix). The "figure" wrapper carries the
+    // footstep bob and crash-tilt, all without disturbing the shadow or the arrows.
+    const flipper = new Node({ children: [standing, walking] });
+    const figure = new Node({ children: [flipper] });
 
     // Soft ground shadow, kept on the ground (outside the bobbing figure).
     const shadow = new Path(Shape.ellipse(0, 0, figureWidth * 0.42, figureWidth * 0.12, 0), {
@@ -118,14 +121,23 @@ export class MovingManSpriteNode extends Node {
     });
 
     // ── Facing + walk/stand frame selection ──────────────────────────────────────
-    let facing = 1; // +1 faces left (native walking art), -1 faces right
+    // facing is +1 to face left (native walking art) or -1 to face right (mirrored). The
+    // mirror is applied as an absolute matrix, and only when facing actually changes:
+    // setScaleMagnitude cannot be used here because it reads the scale back as a positive
+    // magnitude, so a repeated setScaleMagnitude(-1, 1) appends scaling(-1) every call and
+    // flips the figure every frame — a flicker seen only when walking right.
+    let facing = 1;
     man.velocityProperty.link((velocity) => {
+      let nextFacing = facing;
       if (velocity > FACING_THRESHOLD) {
-        facing = -1; // moving right -> mirror the left-facing art
+        nextFacing = -1; // moving right -> mirror the left-facing art
       } else if (velocity < -FACING_THRESHOLD) {
-        facing = 1; // moving left -> art as drawn
+        nextFacing = 1; // moving left -> art as drawn
       }
-      figure.setScaleMagnitude(facing, 1);
+      if (nextFacing !== facing) {
+        facing = nextFacing;
+        flipper.matrix = Matrix3.scaling(facing, 1);
+      }
 
       const walkingNow = Math.abs(velocity) > WALK_THRESHOLD;
       walking.visible = walkingNow;
