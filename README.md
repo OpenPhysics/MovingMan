@@ -24,8 +24,11 @@ npm run dev         # start the Vite dev server
 npm run build       # tsc + vite build
 npm run preview     # preview the built site
 npm run lint        # biome check
+npm run fix         # biome check --write (lint + format, applying fixes)
+npm run format      # biome format --write
 npm run check       # tsc --noEmit (both src and scripts)
 npm run icons       # rasterize public/icons/icon.svg into the PWA icons
+npm run clean       # remove the dist/ build output
 ```
 
 ## Notable deviations from the original
@@ -38,6 +41,8 @@ npm run icons       # rasterize public/icons/icon.svg into the PWA icons
 - **Collision sound effects** play a thud plus a random grunt on each wall hit
   (tambo `SoundClip`s driven by the model's `collideEmitter`); toggle them with the
   navigation-bar sound button.
-- Cosmetic: the man is drawn with vector shapes (not the original sprite) but his
-  legs stride while walking and he leans on a wall hit; the original tree and cottage
-  art stand on the ground. The easter-egg cloud animation is not included.
+- Cosmetic: the man is rendered as a Scenery sprite using the original PhET figure
+  art — he stands at rest and switches to a mid-stride walking frame facing his
+  direction of travel, with a footstep bob and a lean-and-recover on each wall hit;
+  the original tree and cottage art stand on the ground. The easter-egg cloud
+  animation is not included.

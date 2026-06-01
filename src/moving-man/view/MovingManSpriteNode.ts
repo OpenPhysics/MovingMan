@@ -6,9 +6,6 @@
  * switches to a mid-stride walking frame when moving, facing the direction of travel,
  * with a springy footstep bob, a ground shadow, and a comedic lean-and-recover when he
  * bonks a wall. Velocity (red) and acceleration (green) arrows float above his head.
- *
- * Drop-in replacement for the old vector man — identical public constructor signature
- * and reactive behaviour (position tracking, facing direction, arrow overlays, drag).
  */
 
 import { Matrix3 } from "scenerystack/dot";

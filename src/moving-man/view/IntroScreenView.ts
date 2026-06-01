@@ -7,7 +7,7 @@
  * bottom-right.
  *
  * No recording / playback chrome — that's reserved for the Charts screen, matching the
- * original sim's simplification of the Intro tab (see Deviations.md in the source).
+ * original sim's simplification of the Intro tab.
  */
 
 import { AlignGroup, Node, VBox } from "scenerystack/scenery";
