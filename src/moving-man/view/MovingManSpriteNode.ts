@@ -61,13 +61,23 @@ export type MovingManSpriteNodeOptions = {
   feetY: number;
   /** Target standing height of the figure, in view pixels. */
   manHeight: number;
+  /** Gap (px) between the top of the head and the velocity arrow. */
+  arrowGapAboveHead?: number;
+  /** Vertical gap (px) between the stacked velocity and acceleration arrows. */
+  arrowStackGap?: number;
 };
 
 export class MovingManSpriteNode extends Node {
   public constructor(model: MovingManModel, options: MovingManSpriteNodeOptions) {
     super({ cursor: "pointer" });
 
-    const { transform, feetY, manHeight: h } = options;
+    const {
+      transform,
+      feetY,
+      manHeight: h,
+      arrowGapAboveHead = ARROW_GAP_ABOVE_HEAD,
+      arrowStackGap = ARROW_STACK_GAP,
+    } = options;
     const man = model.movingMan;
 
     // Both frames share one pixels-per-native-pixel scale so the figure keeps a
@@ -110,8 +120,8 @@ export class MovingManSpriteNode extends Node {
       ...ARROW_OPTIONS,
       fill: MovingManColors.accelerationProperty,
     });
-    const velocityArrowY = -h - ARROW_GAP_ABOVE_HEAD;
-    const accelerationArrowY = velocityArrowY - ARROW_STACK_GAP;
+    const velocityArrowY = -h - arrowGapAboveHead;
+    const accelerationArrowY = velocityArrowY - arrowStackGap;
 
     this.children = [shadow, figure, velocityArrow, accelerationArrow];
     this.y = feetY;

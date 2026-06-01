@@ -151,12 +151,15 @@ export class ChartNode extends Node {
         verticalGridLines,
         horizontalGridLines,
         zeroAxis,
-        // Clip the line plot to the chart rectangle.
+        // Clip the line plot and the playback cursor to the chart rectangle. Clipping the
+        // cursor matters as much as clipping the line: when the (zoomed) time range is
+        // smaller than the current time, the cursor's view-x lands far past the right edge,
+        // and without a clip it would both draw outside the chart and — because clipArea
+        // constrains bounds — stretch this node's bounds and the surrounding layout.
         new Node({
           clipArea: Shape.bounds(chartRectangle.bounds),
-          children: [this.linePlot],
+          children: [this.linePlot, this.cursorLine],
         }),
-        this.cursorLine,
         yTickMarks,
         yTickLabels,
         xTickMarks,

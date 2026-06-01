@@ -1,30 +1,49 @@
 /**
  * PlaybackControls.ts
  *
- * The bottom-of-screen transport for the Charts screen: a Record/Playback radio,
- * rewind/play-pause/step transport buttons, a Clear button, and a Playback-Speed
- * slider. (Reset All lives in the screen view.)
+ * The bottom-of-screen transport for the Charts screen: a Record/Playback radio, a
+ * rewind-to-start button, the standard play/pause + step + Slow/Normal/Fast speed control
+ * (scenery-phet's TimeControlNode), and an eraser button that clears the recording.
+ * (Reset All lives in the screen view.)
  */
 
-import { DerivedProperty, Property, type TReadOnlyProperty } from "scenerystack/axon";
-import { Dimension2 } from "scenerystack/dot";
-import { HBox, type Node, Text, VBox } from "scenerystack/scenery";
-import { PhetFont, PlayPauseButton, StepBackwardButton, StepForwardButton } from "scenerystack/scenery-phet";
-import { AquaRadioButtonGroup, HSlider, TextPushButton } from "scenerystack/sun";
+import { EnumerationProperty, Property, type TReadOnlyProperty } from "scenerystack/axon";
+import { HBox, type Node, Text } from "scenerystack/scenery";
+import { EraserButton, PhetFont, RestartButton, TimeControlNode, TimeSpeed } from "scenerystack/scenery-phet";
+import { AquaRadioButtonGroup } from "scenerystack/sun";
+import { Tandem } from "scenerystack/tandem";
 import { StringManager } from "../../i18n/StringManager.js";
 import MovingManColors from "../../MovingManColors.js";
-import MovingManConstants from "../model/MovingManConstants.js";
 import type { MovingManModel } from "../model/MovingManModel.js";
 
 const LABEL_FONT = new PhetFont(13);
-const SMALL_FONT = new PhetFont(10);
 
 const RADIO_BUTTON_SPACING = 12;
 const RADIO_BUTTON_RADIUS = 8;
 const TRANSPORT_BUTTON_RADIUS = 16;
 const PLAY_PAUSE_BUTTON_RADIUS = 20;
 const CONTROLS_SPACING = 20;
-const SPEED_SLIDER_WIDTH = 130;
+// Spacing between the rewind button and the standard play/pause + step group, matched to
+// the group's own internal button spacing so the whole transport reads as one cluster.
+const TRANSPORT_SPACING = 10;
+
+// Discrete playback speeds behind the Slow / Normal / Fast radio buttons. The model's
+// playbackSpeedProperty stays the source of truth (Reset All resets it to Normal = 1).
+const SPEED_VALUE = new Map<TimeSpeed, number>([
+  [TimeSpeed.SLOW, 0.5],
+  [TimeSpeed.NORMAL, 1],
+  [TimeSpeed.FAST, 2],
+]);
+
+function valueToSpeed(value: number): TimeSpeed {
+  if (value <= 0.75) {
+    return TimeSpeed.SLOW;
+  }
+  if (value >= 1.5) {
+    return TimeSpeed.FAST;
+  }
+  return TimeSpeed.NORMAL;
+}
 
 function labelText(stringProperty: TReadOnlyProperty<string>): Node {
   return new Text(stringProperty, { font: LABEL_FONT, fill: MovingManColors.foregroundColorProperty });
@@ -65,49 +84,54 @@ export class PlaybackControls extends HBox {
       },
     );
 
-    const rewindButton = new StepBackwardButton({
+    // ── Slow / Normal / Fast, mirrored to/from the model's continuous speed Property ──
+    const timeSpeedProperty = new EnumerationProperty(valueToSpeed(model.playbackSpeedProperty.value));
+    timeSpeedProperty.link((speed) => {
+      model.playbackSpeedProperty.value = SPEED_VALUE.get(speed) ?? 1;
+    });
+    model.playbackSpeedProperty.link((value) => {
+      timeSpeedProperty.value = valueToSpeed(value);
+    });
+
+    // Rewind to t = 0.
+    const rewindButton = new RestartButton({
       radius: TRANSPORT_BUTTON_RADIUS,
       listener: () => model.rewind(),
     });
 
-    const playPauseButton = new PlayPauseButton(model.isPlayingProperty, { radius: PLAY_PAUSE_BUTTON_RADIUS });
-
-    const stepForwardButton = new StepForwardButton({
-      radius: TRANSPORT_BUTTON_RADIUS,
-      enabledProperty: DerivedProperty.not(model.isPlayingProperty),
-      listener: () => model.stepOnce(),
+    // Standard play/pause + step + speed radio (handles grouping and spacing for us).
+    const timeControlNode = new TimeControlNode(model.isPlayingProperty, {
+      timeSpeedProperty,
+      timeSpeeds: [TimeSpeed.FAST, TimeSpeed.NORMAL, TimeSpeed.SLOW],
+      flowBoxSpacing: 16,
+      playPauseStepButtonOptions: {
+        playPauseStepXSpacing: TRANSPORT_SPACING,
+        playPauseButtonOptions: { radius: PLAY_PAUSE_BUTTON_RADIUS },
+        // The step-forward button is enabled only while paused (the group's default).
+        stepForwardButtonOptions: {
+          radius: TRANSPORT_BUTTON_RADIUS,
+          listener: () => model.stepOnce(),
+        },
+      },
+      tandem: Tandem.OPT_OUT,
     });
 
-    const clearButton = new TextPushButton(playback.clearStringProperty, {
-      font: LABEL_FONT,
+    // Clear all recorded data.
+    const eraserButton = new EraserButton({
       listener: () => model.clear(),
     });
 
-    // ── Speed slider ─────────────────────────────────────────────────────────
-    const speedSlider = new HSlider(model.playbackSpeedProperty, MovingManConstants.PLAYBACK_SPEED_RANGE, {
-      trackSize: new Dimension2(SPEED_SLIDER_WIDTH, 3),
-    });
-    // Tick labels at slow / normal / fast — the slider's own helpers ensure they line up.
-    speedSlider.addMajorTick(MovingManConstants.PLAYBACK_SPEED_RANGE.min, new Text("0.2×", { font: SMALL_FONT }));
-    speedSlider.addMajorTick(1, new Text("1×", { font: SMALL_FONT }));
-    speedSlider.addMajorTick(MovingManConstants.PLAYBACK_SPEED_RANGE.max, new Text("4×", { font: SMALL_FONT }));
-
-    const speedBox = new VBox({
-      spacing: 2,
+    // Keep the rewind button tight against the standard transport group.
+    const transport = new HBox({
+      spacing: TRANSPORT_SPACING,
       align: "center",
-      children: [
-        new Text(playback.playbackSpeedStringProperty, {
-          font: SMALL_FONT,
-          fill: MovingManColors.foregroundColorProperty,
-        }),
-        speedSlider,
-      ],
+      children: [rewindButton, timeControlNode],
     });
 
     super({
       spacing: CONTROLS_SPACING,
       align: "center",
-      children: [recordPlaybackGroup, rewindButton, playPauseButton, stepForwardButton, clearButton, speedBox],
+      children: [recordPlaybackGroup, transport, eraserButton],
     });
   }
 }

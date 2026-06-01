@@ -12,6 +12,7 @@
 
 import { BooleanProperty, NumberProperty } from "scenerystack/axon";
 import type { TModel } from "scenerystack/joist";
+import { secondsUnit } from "scenerystack/scenery-phet";
 import { closestIndex } from "./binarySearch.js";
 import type { ManState } from "./MovingMan.js";
 import { type ManContext, MovingMan } from "./MovingMan.js";
@@ -31,7 +32,7 @@ export class MovingManModel implements TModel, ManContext {
   public readonly wallsEnabledProperty = new BooleanProperty(true);
   public readonly recordingProperty = new BooleanProperty(true);
   public readonly isPlayingProperty = new BooleanProperty(false);
-  public readonly timeProperty = new NumberProperty(0);
+  public readonly timeProperty = new NumberProperty(0, { units: secondsUnit });
   public readonly furthestRecordedTimeProperty = new NumberProperty(0);
   public readonly playbackSpeedProperty = new NumberProperty(1);
 

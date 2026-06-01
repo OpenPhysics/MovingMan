@@ -12,9 +12,9 @@
  */
 
 import type { Property, TReadOnlyProperty } from "scenerystack/axon";
-import { NumberProperty } from "scenerystack/axon";
+import { BooleanProperty, NumberProperty, StringProperty } from "scenerystack/axon";
 import { Dimension2, type Range } from "scenerystack/dot";
-import { type Node, type TColor, Text, VBox } from "scenerystack/scenery";
+import { type Node, type TColor, Text, VBox, VStrut } from "scenerystack/scenery";
 import { NumberControl, PhetFont } from "scenerystack/scenery-phet";
 import { Checkbox, Panel } from "scenerystack/sun";
 import { StringManager } from "../../i18n/StringManager.js";
@@ -115,6 +115,10 @@ export class VariableControl extends Panel {
     const children: Node[] = [numberControl];
     if (bundle.vectorVisibleProperty && bundle.vectorLabelStringProperty) {
       children.push(VariableControl.makeVectorCheckbox(bundle.vectorVisibleProperty, bundle.vectorLabelStringProperty));
+    } else {
+      // Reserve the height of a vector-checkbox row so every quantity panel is the same
+      // height whether or not it has a checkbox (Position has none).
+      children.push(new VStrut(VariableControl.vectorCheckboxHeight()));
     }
 
     const content = new VBox({ align: "center", spacing: PANEL_VSPACING, children });
@@ -199,6 +203,17 @@ export class VariableControl extends Panel {
   ): Node {
     const label = new Text(labelStringProperty, { font: LABEL_FONT, fill: MovingManColors.foregroundColorProperty });
     return new Checkbox(visibleProperty, label, { boxWidth: 14 });
+  }
+
+  // Height of a vector-checkbox row, measured once from a throwaway checkbox and reused to
+  // pad the Position panel (which has no checkbox) to the same height as the others.
+  private static cachedVectorCheckboxHeight: number | null = null;
+  private static vectorCheckboxHeight(): number {
+    if (VariableControl.cachedVectorCheckboxHeight === null) {
+      const sample = VariableControl.makeVectorCheckbox(new BooleanProperty(false), new StringProperty("X"));
+      VariableControl.cachedVectorCheckboxHeight = sample.height;
+    }
+    return VariableControl.cachedVectorCheckboxHeight;
   }
 
   private static clampToRange(value: number, range: Range): number {

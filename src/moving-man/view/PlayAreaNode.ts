@@ -13,9 +13,10 @@
  */
 
 import type { TReadOnlyProperty } from "scenerystack/axon";
+import { Range } from "scenerystack/dot";
 import { Shape } from "scenerystack/kite";
-import { Image, LinearGradient, Node, Rectangle, type TColor, Text } from "scenerystack/scenery";
-import { PhetFont, RulerNode } from "scenerystack/scenery-phet";
+import { HBox, Image, LinearGradient, Node, Rectangle, type TColor, Text } from "scenerystack/scenery";
+import { NumberDisplay, PhetFont, RulerNode } from "scenerystack/scenery-phet";
 import { StringManager } from "../../i18n/StringManager.js";
 import MovingManColors from "../../MovingManColors.js";
 import cottageImage from "../images/cottage.gif";
@@ -33,17 +34,18 @@ const SKY_FRACTION = 0.62;
 // Wall geometry: the brick column rises this fraction of the play-area height.
 const WALL_HEIGHT_FRACTION = 0.46;
 
-// Ruler.
-const RULER_HEIGHT = 36;
+// Ruler. The Introduction screen (full size) uses a taller ruler with larger, bolder
+// labels so the scale stands out; the Charts screen (compact) keeps a smaller ruler.
+// Per-size dimensions are picked in the constructor from these. Major-tick height must
+// stay strictly less than the ruler height / 2, which RulerNode asserts.
 const RULER_INSET_BELOW_GROUND = 6;
-// Must be strictly less than RULER_HEIGHT / 2, which RulerNode asserts.
-const RULER_MAJOR_TICK_HEIGHT = 16;
-const RULER_FONT = new PhetFont(11);
-const RULER_UNITS_FONT = new PhetFont(10);
 
 // Clock readout.
-const CLOCK_FONT = new PhetFont({ size: 14, weight: "bold" });
+const CLOCK_LABEL_FONT = new PhetFont({ size: 14, weight: "bold" });
 const CLOCK_MARGIN = 8;
+// Sized to fit times well beyond a typical run so the NumberDisplay background — which is
+// sized to this range — never has to grow as the readout climbs into double/triple digits.
+const CLOCK_DISPLAY_RANGE = new Range(0, 999.9);
 
 // Background scenery (tree on the left, cottage on the right), as fractions of height,
 // standing on the ground line. Native art is tree 109×100, cottage 100×88.
@@ -115,10 +117,11 @@ export class PlayAreaNode extends Node {
       labels.push(i % 2 === 0 ? String(i) : "");
     }
     const rulerWidth = transform.pixelsPerMeter * (2 * HALF_CONTAINER_WIDTH);
-    const ruler = new RulerNode(rulerWidth, RULER_HEIGHT, transform.pixelsPerMeter, labels, "m", {
-      majorTickFont: RULER_FONT,
-      unitsFont: RULER_UNITS_FONT,
-      majorTickHeight: RULER_MAJOR_TICK_HEIGHT,
+    const rulerHeight = compact ? 36 : 52;
+    const ruler = new RulerNode(rulerWidth, rulerHeight, transform.pixelsPerMeter, labels, "m", {
+      majorTickFont: compact ? new PhetFont(11) : new PhetFont({ size: 15, weight: "bold" }),
+      unitsFont: compact ? new PhetFont(10) : new PhetFont({ size: 13, weight: "bold" }),
+      majorTickHeight: compact ? 10 : 14,
       minorTicksPerMajorTick: 0,
       insetsWidth: 0,
       x: transform.modelToViewX(-HALF_CONTAINER_WIDTH),
@@ -133,9 +136,17 @@ export class PlayAreaNode extends Node {
     cottage.centerX = transform.modelToViewX(COTTAGE_MODEL_X);
     cottage.bottom = groundLineY + 2;
 
-    // The man stands with his feet on the ground line.
-    const manHeight = compact ? 82 : 150;
-    const man = new MovingManSpriteNode(model, { transform, feetY: groundLineY, manHeight });
+    // The man stands with his feet on the ground line. On the compact (Charts) play area he
+    // is shorter and his velocity/acceleration arrows use tighter gaps, so the stacked
+    // arrows above his head still fit inside the short play area instead of being clipped
+    // off the top.
+    const manHeight = compact ? 66 : 150;
+    const man = new MovingManSpriteNode(model, {
+      transform,
+      feetY: groundLineY,
+      manHeight,
+      ...(compact ? { arrowGapAboveHead: 6, arrowStackGap: 12 } : {}),
+    });
 
     // Clock readout, top-left of the play area.
     const clock = new ClockReadout(model.timeProperty, compact);
@@ -206,32 +217,39 @@ class ClockReadout extends Node {
   public constructor(timeProperty: TReadOnlyProperty<number>, compact: boolean) {
     super();
     const clockStrings = StringManager.getInstance().getClockStrings();
-    const units = clockStrings.secondsStringProperty;
 
-    const valueFont = new PhetFont({ size: compact ? 12 : 14, weight: "bold" });
-    const value = new Text("", { font: valueFont, fill: MovingManColors.foregroundColorProperty });
+    // The time Property carries scenery-phet's secondsUnit, so NumberDisplay formats the
+    // value with localized units ("10.3 s") on its own. NumberDisplay also reserves room
+    // for the largest time in CLOCK_DISPLAY_RANGE, so the readout no longer outgrows its
+    // background as the value climbs past a single digit.
+    const numberDisplay = new NumberDisplay(timeProperty, CLOCK_DISPLAY_RANGE, {
+      decimalPlaces: 1,
+      align: "left",
+      // The outer pill below provides the background; let NumberDisplay just reserve width.
+      backgroundFill: null,
+      backgroundStroke: null,
+      xMargin: 0,
+      yMargin: 0,
+      textOptions: {
+        font: new PhetFont({ size: compact ? 12 : 14, weight: "bold" }),
+        fill: MovingManColors.foregroundColorProperty,
+      },
+    });
 
-    const updateValue = (): void => {
-      value.string = `${timeProperty.value.toFixed(1)} ${units.value}`;
-    };
-    timeProperty.link(updateValue);
-    units.link(updateValue);
-
-    // The full readout includes a "Time:" label; the compact form just shows the value.
-    const content = new Node();
+    // The full readout includes a bold "Time:" label; the compact form just shows the value.
+    const content = new HBox({ spacing: 6, align: "center" });
     if (compact) {
-      content.addChild(value);
+      content.children = [numberDisplay];
     } else {
       const label = new Text(clockStrings.timeStringProperty, {
-        font: CLOCK_FONT,
+        font: CLOCK_LABEL_FONT,
         fill: MovingManColors.foregroundColorProperty,
       });
-      value.left = label.right + 6;
-      value.centerY = label.centerY;
-      content.children = [label, value];
+      content.children = [label, numberDisplay];
     }
 
-    // Background pill so the readout stays legible over the sky gradient.
+    // Background pill so the readout stays legible over the sky gradient. The content now
+    // has a fixed width, so this pill is sized once and never lags behind the value.
     const padding = 5;
     const bounds = content.bounds.dilated(padding);
     const background = new Rectangle(bounds.x, bounds.y, bounds.width, bounds.height, {
