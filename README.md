@@ -1,37 +1,22 @@
 # Moving Man
 
-A [SceneryStack](https://scenerystack.org/) port of the PhET **Moving Man** simulation. Drag the man or
-drive his motion with Position, Velocity, or Acceleration controls, and record playback on time-series
-charts.
+A [SceneryStack](https://scenerystack.org/) port of the PhET **Moving Man** simulation. Explore 1D
+kinematics by dragging the man or using position, velocity, and acceleration controls.
 
-## Screens
+## Features
 
-- **Introduction** — A man, two walls, and a ruler. Drag the man (or use the Position / Velocity /
-  Acceleration sliders) to drive his motion. Toggle the velocity and acceleration vector arrows from the
-  controls.
-- **Charts** — Same play area, plus a stack of three time-series charts (one per quantity). Record motion,
-  then scrub through it with a record/playback radio, rewind / play / step transport, playback-speed slider,
-  and a click-to-seek cursor inside each chart. Each chart sits in a collapsible box with its own value-axis
-  zoom; a shared control zooms the time axis of all three at once.
-
-## Notable deviations from the original
-
-- The original's free-form **"use function"** formula entry is replaced by an **x(t) preset menu** (an
-  `x(t):` combo box on both screens) offering linear, parabolic, sinusoidal, and root functions; SceneryStack
-  has no built-in text input. Choosing one drives position from the function (velocity/acceleration are the
-  usual derivatives) and disables the position control; "Off" restores slider/drag control.
-- **Collision sound effects** play a thud plus a random grunt on each wall hit (tambo `SoundClip`s driven by
-  the model's `collideEmitter`); toggle them with the navigation-bar sound button.
-- Cosmetic: the man is rendered as a Scenery sprite using the original PhET figure art — he stands at rest
-  and switches to a mid-stride walking frame facing his direction of travel, with a footstep bob and a
-  lean-and-recover on each wall hit; the original tree and cottage art stand on the ground. The easter-egg
-  cloud animation is not included.
+- **Introduction** screen with draggable man, walls, ruler, and vector arrows
+- **Charts** screen with three time-series graphs and record/playback transport
+- x(t) preset menu (linear, parabolic, sinusoidal, root) in place of free-form formula entry
+- Collision sound effects with navigation-bar sound toggle
+- Sprite-based man with walking animation and wall-collision lean
+- English and French UI, projector color profile, and PWA support
 
 ## Quick Start
 
 ```bash
 npm install
-npm run icons    # rasterize public/icons/icon.svg into the PWA icons
+npm run icons    # generate PNG icons from public/icons/icon.svg
 npm start        # dev server → http://localhost:5173
 ```
 
@@ -42,11 +27,11 @@ npm start        # dev server → http://localhost:5173
 | `npm start` / `npm run dev` | Start Vite dev server |
 | `npm run build` | Type-check + production build → `dist/` |
 | `npm run preview` | Preview the production build locally |
-| `npm run check` | TypeScript type check (`src` + `scripts`) |
+| `npm run check` | TypeScript type check |
 | `npm run lint` | Biome lint check |
 | `npm run format` | Auto-format all files |
 | `npm run fix` | Lint + auto-fix |
-| `npm run icons` | Regenerate PWA icons from `public/icons/icon.svg` |
+| `npm run icons` | Regenerate PNG icons from `public/icons/icon.svg` |
 | `npm run clean` | Remove `dist/` |
 
 ## Tech Stack
