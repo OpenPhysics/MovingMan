@@ -1,12 +1,18 @@
 /**
  * main.ts
  *
- * Entry point for the Moving Man application. Initializes the simulation,
- * creates the Introduction and Charts screens, and starts the main event loop.
+ * Entry point for the simulation. Initializes SceneryStack, creates the
+ * screen, and starts the main event loop.
+ *
+ * !! CRITICAL IMPORT ORDER !!
+ * brand.js MUST be the first import. It triggers the full bootstrap chain:
+ *
+ *   brand.ts → splash.ts → assert.ts → init.ts
+ *
+ * SceneryStack requires this exact load order. Never reorder these imports.
  */
 
-// NOTE: brand.js needs to be the first import. SceneryStack sims require a specific load order:
-// init.ts => assert.ts => splash.ts => brand.ts => everything else (here).
+// brand.js MUST be first — triggers: init.ts → assert.ts → splash.ts → brand.ts
 import "./brand.js";
 
 import { onReadyToLaunch, PreferencesModel, Sim } from "scenerystack/sim";
