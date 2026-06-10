@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "A sceneryStack port of the Moving Man simulation.",
+  "description": "SceneryStack port of the PhET Java 'Moving Man' simulation. Explore 1D kinematics by dragging a man or using position/velocity/acceleration sliders.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -42,7 +42,7 @@
     "sharp": "^0.34.5",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
-    "vite": "^8.0.14",
+    "vite": "^8.0.16",
     "vite-plugin-pwa": "^1.3.0"
   },
   "engines": {

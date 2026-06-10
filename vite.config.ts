@@ -34,9 +34,10 @@ const securityHeaders: Record<string, string> = {
 
 // https://vite.dev/config/
 export default defineConfig({
-  // So the build can be served from an arbitrary path (e.g. a GitHub Pages project subpath).
+  // So the build can be served from an arbitrary path
   base: "./",
   build: {
+    // Requires Vite 8+ / esbuild ≥0.24. Run `npm ci` if build errors on ES2024.
     target: "es2024",
   },
   server: {
@@ -53,7 +54,7 @@ export default defineConfig({
         name: "Moving Man",
         // biome-ignore lint/style/useNamingConvention: Web App Manifest spec requires snake_case keys
         short_name: "MovingMan",
-        description: "A sceneryStack port of the Moving Man simulation.",
+        description: "A SceneryStack port of the Moving Man simulation.",
         // biome-ignore lint/style/useNamingConvention: Web App Manifest spec requires snake_case keys
         theme_color: "#2575ba",
         // biome-ignore lint/style/useNamingConvention: Web App Manifest spec requires snake_case keys
