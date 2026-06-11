@@ -67,7 +67,9 @@ export class PlayAreaNode extends Node {
   public readonly linearTransform: LinearTransform;
 
   public constructor(model: MovingManModel, options: PlayAreaNodeOptions) {
-    super();
+    // Permanent per-screen scene; never disposed, so declare it (the wallsEnabled link below
+    // and the inner ClockReadout's NumberDisplay are intentionally lifetime-scoped).
+    super({ isDisposable: false });
 
     const { width, height, compact = false, manHeight: manHeightOverride } = options;
 
@@ -120,7 +122,10 @@ export class PlayAreaNode extends Node {
     }
     const rulerWidth = transform.pixelsPerMeter * (2 * HALF_CONTAINER_WIDTH);
     const rulerHeight = compact ? 36 : 52;
-    const ruler = new RulerNode(rulerWidth, rulerHeight, transform.pixelsPerMeter, labels, "m", {
+    // RulerNode takes a plain units string (not a Property), so read the localized value at
+    // construction; the ruler is rebuilt per screen and does not live-update on locale change.
+    const metersUnitString = StringManager.getInstance().getUnitStrings().positionStringProperty.value;
+    const ruler = new RulerNode(rulerWidth, rulerHeight, transform.pixelsPerMeter, labels, metersUnitString, {
       majorTickFont: compact ? new PhetFont(11) : new PhetFont({ size: 15, weight: "bold" }),
       unitsFont: compact ? new PhetFont(10) : new PhetFont({ size: 13, weight: "bold" }),
       majorTickHeight: compact ? 10 : 14,
@@ -184,7 +189,7 @@ export class PlayAreaNode extends Node {
     const courseHeight = Math.max(7, height / 9);
     const mortar = 2;
     const brickWidth = width * 0.56;
-    const highlight = "rgba(255,255,255,0.18)";
+    const highlight: TColor = MovingManColors.wallBrickHighlightProperty;
 
     node.addChild(new Rectangle(0, 0, width, height, { fill: mortarFill }));
 
@@ -217,7 +222,7 @@ export class PlayAreaNode extends Node {
 
 class ClockReadout extends Node {
   public constructor(timeProperty: TReadOnlyProperty<number>, compact: boolean) {
-    super();
+    super({ isDisposable: false });
     const clockStrings = StringManager.getInstance().getClockStrings();
 
     // The time Property carries scenery-phet's secondsUnit, so NumberDisplay formats the
@@ -255,7 +260,7 @@ class ClockReadout extends Node {
     const padding = 5;
     const bounds = content.bounds.dilated(padding);
     const background = new Rectangle(bounds.x, bounds.y, bounds.width, bounds.height, {
-      fill: "rgba(255,255,255,0.7)",
+      fill: MovingManColors.clockReadoutBackgroundProperty,
       cornerRadius: 4,
     });
 

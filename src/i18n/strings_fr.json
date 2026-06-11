@@ -19,7 +19,9 @@
     "showAcceleration": "Vecteur accélération"
   },
   "controls": {
-    "walls": "Murs"
+    "walls": "Murs",
+    "functionLabel": "x(t):",
+    "functionOff": "Désactivé"
   },
   "playback": {
     "record": "Enregistrer",
@@ -33,5 +35,12 @@
   },
   "chart": {
     "time": "temps (s)"
+  },
+  "patterns": {
+    "quantityWithUnits": "{{quantity}} ({{units}})"
+  },
+  "a11y": {
+    "manAccessibleName": "Homme en mouvement",
+    "timeCursorAccessibleName": "Curseur temporel du graphique"
   }
 }

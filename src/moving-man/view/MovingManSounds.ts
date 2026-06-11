@@ -75,8 +75,12 @@ function playCollision(): void {
 /**
  * Wire a model's collision emitter to the collision sounds. Safe to call once per
  * screen; the underlying clips are shared across all callers.
+ *
+ * @param collideEmitter - emitter that fires on every wall hit.
+ * @returns a disposer that detaches this screen's listener (the shared clips stay registered).
  */
-export function addCollisionSounds(collideEmitter: Emitter): void {
+export function addCollisionSounds(collideEmitter: Emitter): () => void {
   ensureClips();
   collideEmitter.addListener(playCollision);
+  return () => collideEmitter.removeListener(playCollision);
 }

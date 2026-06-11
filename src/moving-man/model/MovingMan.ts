@@ -12,6 +12,7 @@
  */
 
 import { Emitter, NumberProperty, Property } from "scenerystack/axon";
+import { metersPerSecondSquaredUnit, metersPerSecondUnit, metersUnit } from "scenerystack/scenery-phet";
 import { type DataPoint, type DataSeries, LimitedSizeDataSeries, LimitedTimeDataSeries } from "./DataSeries.js";
 import type { MovingManFunctionPreset } from "./functionPresets.js";
 import { MotionStrategy } from "./MotionStrategy.js";
@@ -48,9 +49,9 @@ export type ManState = {
 };
 
 export class MovingMan {
-  public readonly positionProperty = new NumberProperty(0);
-  public readonly velocityProperty = new NumberProperty(0);
-  public readonly accelerationProperty = new NumberProperty(0);
+  public readonly positionProperty = new NumberProperty(0, { units: metersUnit });
+  public readonly velocityProperty = new NumberProperty(0, { units: metersPerSecondUnit });
+  public readonly accelerationProperty = new NumberProperty(0, { units: metersPerSecondSquaredUnit });
   public readonly motionStrategyProperty = new Property<MotionStrategy>(MotionStrategy.POSITION);
 
   // When non-null, the man's position is driven by this preset function of time x(t),
@@ -121,6 +122,10 @@ export class MovingMan {
 
   // ── History management ────────────────────────────────────────────────────────
 
+  /**
+   * Wipe all history and the rolling derivative windows, restarting the pipeline at the man's
+   * current position (time = 0). Fires historyClearedEmitter so the charts drop stale graph data.
+   */
   public clear(): void {
     this.time = 0;
     this.times.length = 0;
@@ -137,6 +142,13 @@ export class MovingMan {
     this.historyClearedEmitter.emit();
   }
 
+  /**
+   * Drop every recorded and rolling-window sample at or after `time` (used when the user begins
+   * recording over an existing run). Fires historyClearedEmitter so the charts re-read the
+   * truncated series.
+   *
+   * @param time - model time (seconds); samples with time >= this are discarded.
+   */
   public clearHistoryAfter(time: number): void {
     this.times.length = 0;
 
@@ -151,6 +163,8 @@ export class MovingMan {
     this.historyClearedEmitter.emit();
   }
 
+  /** Snapshot the man's instantaneous kinematic state (position/velocity/acceleration/strategy)
+   * for the playback history. Returns a fresh plain object the caller owns. */
   public getState(): ManState {
     return {
       position: this.positionProperty.value,
@@ -160,6 +174,15 @@ export class MovingMan {
     };
   }
 
+  /**
+   * Restore a previously recorded state while scrubbing or playing back. Sets the
+   * position/velocity/acceleration/strategy Properties and the time bookkeeping to `time`; the
+   * rolling derivative windows are intentionally left untouched because playback reads recorded
+   * values rather than re-differentiating.
+   *
+   * @param time - model time (seconds) this state belongs to.
+   * @param state - the snapshot produced by getState().
+   */
   public applyState(time: number, state: ManState): void {
     this.time = time;
     this.times = [];
@@ -180,6 +203,17 @@ export class MovingMan {
       this.times.shift();
     }
 
+    this.dispatchUpdate(time, delta);
+  }
+
+  /**
+   * Run a single step against whichever driver is active, WITHOUT recording the frame time.
+   * Split out from update() so the wall-collision replay in updateFromAcceleration can re-run
+   * this frame at the same timestamp without pushing a second copy of `time` onto `times` — a
+   * duplicate would skew the centered-derivative time lookups (getTimeNTimeStepsAgo) for the
+   * next several frames if the user switched back to a differentiated driver.
+   */
+  private dispatchUpdate(time: number, delta: number): void {
     const preset = this.functionProperty.value;
     if (preset) {
       this.updateFromFunction(time, preset);
@@ -313,15 +347,16 @@ export class MovingMan {
     // A deceleration spike when crashing into a wall: switch to velocity-driven and
     // rerun the step so the wall stops the man rather than the acceleration carrying on.
     // Replay at the SAME time: the Java original rolls time back by dt and then re-adds
-    // it inside its step method, so the replayed frame lands on the original time. Our
-    // update() sets time directly (it doesn't re-add dt), so we must pass `time`, not
-    // `time - delta`. Passing `time - delta` (as the PIXI port did) duplicates the
-    // previous frame's timestamp and skips this one, leaving a backtrack/kink on the
+    // it inside its step method, so the replayed frame lands on the original time. We
+    // re-dispatch via dispatchUpdate (not update()), which keeps the original `time` but
+    // does NOT re-push it onto `times` — re-running update() here would record this frame's
+    // timestamp twice. Passing `time - delta` (as the PIXI port did) would instead duplicate
+    // the previous frame's timestamp and skip this one, leaving a backtrack/kink on the
     // charts and a one-frame desync from the recorded history at the crash.
     if (wallResult.collided) {
       this.setVelocityDriven();
       this.velocityProperty.value = newVelocity;
-      this.update(time, delta);
+      this.dispatchUpdate(time, delta);
       return;
     }
 
@@ -345,6 +380,13 @@ export class MovingMan {
 
   // ── Pointer input ─────────────────────────────────────────────────────────────
 
+  /**
+   * Set the pointer's target model x, clamped to the walls. While paused this also moves the man
+   * immediately so dragging repositions him without stepping; while running, the step loop reads
+   * this target on the next frame. No-op when `x` is unchanged.
+   *
+   * @param x - target position in model meters (pre-clamp).
+   */
   public setMousePosition(x: number): void {
     if (this.mousePosition !== x) {
       this.mousePosition = this.clampIfWalled(x).position;

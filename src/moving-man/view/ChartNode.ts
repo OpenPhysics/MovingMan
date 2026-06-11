@@ -24,8 +24,9 @@ import {
 import { Range, Vector2 } from "scenerystack/dot";
 import { Shape } from "scenerystack/kite";
 import { Orientation } from "scenerystack/phet-core";
-import { DragListener, Line, Node, type TColor, Text } from "scenerystack/scenery";
+import { DragListener, KeyboardListener, Line, Node, type TColor, Text } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
+import { StringManager } from "../../i18n/StringManager.js";
 import MovingManColors from "../../MovingManColors.js";
 import type { DataSeries } from "../model/DataSeries.js";
 import type { MovingManModel } from "../model/MovingManModel.js";
@@ -43,6 +44,10 @@ const AXIS_LINE_WIDTH = 1;
 const CURSOR_LINE_WIDTH = 1.5;
 
 const GRID_LINE_WIDTH = 0.5;
+
+// Keyboard scrubbing: model-time step (seconds) per arrow-key press; shift is the coarse step.
+const SCRUB_KEY_STEP = 0.25;
+const SCRUB_KEY_STEP_LARGE = 1;
 
 /** One zoom level: axis extent `max` and tick/grid `step`, both in model units. */
 export type ZoomLevel = { readonly max: number; readonly step: number };
@@ -70,7 +75,9 @@ export class ChartNode extends Node {
   private readonly timeProperty: TReadOnlyProperty<number>;
 
   public constructor(model: MovingManModel, timeProperty: TReadOnlyProperty<number>, options: ChartNodeOptions) {
-    super();
+    // This chart lives for the lifetime of the Charts screen and is never disposed; declare that
+    // so the model/zoom/emitter links registered below are not mistaken for an unmanaged leak.
+    super({ isDisposable: false });
     this.series = options.series;
     this.timeProperty = timeProperty;
 
@@ -211,6 +218,39 @@ export class ChartNode extends Node {
     });
     chartRectangle.addInputListener(dragListener);
     chartRectangle.cursor = "ew-resize";
+
+    // Keyboard-accessible scrubbing: focus the chart and use Left/Right (Shift = coarse step,
+    // Home/End jump to the ends of the recording). Only focusable while in playback, mirroring
+    // the pointer scrub's guard so the control is inert during recording.
+    const a11yStrings = StringManager.getInstance().getA11yStrings();
+    chartRectangle.tagName = "div";
+    chartRectangle.accessibleName = a11yStrings.timeCursorAccessibleNameStringProperty;
+    model.recordingProperty.link((recording) => {
+      chartRectangle.focusable = !(recording || model.noRecording);
+    });
+    chartRectangle.addInputListener(
+      new KeyboardListener({
+        keys: ["arrowLeft", "arrowRight", "shift+arrowLeft", "shift+arrowRight", "home", "end"],
+        fire: (_event, keysPressed) => {
+          if (model.recordingProperty.value || model.noRecording) {
+            return;
+          }
+          const max = model.furthestRecordedTimeProperty.value;
+          const step = keysPressed.includes("shift") ? SCRUB_KEY_STEP_LARGE : SCRUB_KEY_STEP;
+          let t = timeProperty.value;
+          if (keysPressed === "home") {
+            t = 0;
+          } else if (keysPressed === "end") {
+            t = max;
+          } else if (keysPressed.endsWith("arrowLeft")) {
+            t -= step;
+          } else if (keysPressed.endsWith("arrowRight")) {
+            t += step;
+          }
+          model.setPlaybackTime(Math.max(0, Math.min(max, t)));
+        },
+      }),
+    );
 
     // Refresh the line whenever the model series may have changed.
     model.movingMan.historyClearedEmitter.addListener(() => this.refresh());

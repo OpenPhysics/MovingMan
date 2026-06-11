@@ -12,8 +12,8 @@
  */
 
 import type { Property, TReadOnlyProperty } from "scenerystack/axon";
-import { BooleanProperty, NumberProperty, StringProperty } from "scenerystack/axon";
-import { Dimension2, type Range } from "scenerystack/dot";
+import { BooleanProperty, NumberProperty, PatternStringProperty, StringProperty } from "scenerystack/axon";
+import { clamp, Dimension2, type Range } from "scenerystack/dot";
 import { type AlignGroup, HBox, type Node, type TColor, Text, VBox, VStrut } from "scenerystack/scenery";
 import { NumberControl, PhetFont } from "scenerystack/scenery-phet";
 import { Checkbox, Panel } from "scenerystack/sun";
@@ -69,19 +69,22 @@ export class VariableControl extends Panel {
     } = options;
     const bundle = VariableControl.resolveBundle(model, kind);
 
-    const titleText = new Text("", { font: TITLE_FONT_NORMAL, fill: bundle.color });
-    const updateTitle = (): void => {
-      titleText.string = `${bundle.titleStringProperty.value} (${bundle.unitStringProperty.value})`;
-    };
-    bundle.titleStringProperty.link(updateTitle);
-    bundle.unitStringProperty.link(updateTitle);
+    // Title is "Quantity (units)", assembled from a localized pattern so the punctuation/order
+    // around the unit can be translated. The PatternStringProperty rerenders when either the
+    // quantity name, the unit, or the pattern itself changes locale.
+    const patterns = StringManager.getInstance().getPatternStrings();
+    const titleStringProperty = new PatternStringProperty(patterns.quantityWithUnitsStringProperty, {
+      quantity: bundle.titleStringProperty,
+      units: bundle.unitStringProperty,
+    });
+    const titleText = new Text(titleStringProperty, { font: TITLE_FONT_NORMAL, fill: bundle.color });
 
     // ── Two-property "lock" pattern ──────────────────────────────────────────
     // The NumberControl is bidirectionally bound to a clamped controlProperty so
     // the slider and display never go out of range. A flag tells the model→control
     // link to update silently (avoiding a feedback loop), and a flag on the
     // control→model link distinguishes user input from these silent updates.
-    const controlProperty = new NumberProperty(VariableControl.clampToRange(bundle.modelProperty.value, range));
+    const controlProperty = new NumberProperty(clamp(bundle.modelProperty.value, range.min, range.max));
     let suppressModelUpdate = false;
     let suppressControlUpdate = false;
 
@@ -90,7 +93,7 @@ export class VariableControl extends Panel {
         return;
       }
       suppressModelUpdate = true;
-      controlProperty.value = VariableControl.clampToRange(value, range);
+      controlProperty.value = clamp(value, range.min, range.max);
       suppressModelUpdate = false;
     });
 
@@ -165,6 +168,9 @@ export class VariableControl extends Panel {
       cornerRadius: PANEL_CORNER_RADIUS,
       xMargin: PANEL_X_MARGIN,
       yMargin: PANEL_Y_MARGIN,
+      // This control lives for the lifetime of its screen and is never disposed; declare that
+      // explicitly so the model-Property links above are not mistaken for an unmanaged leak.
+      isDisposable: false,
     });
   }
 
@@ -250,15 +256,5 @@ export class VariableControl extends Panel {
       VariableControl.cachedVectorCheckboxHeight = sample.height;
     }
     return VariableControl.cachedVectorCheckboxHeight;
-  }
-
-  private static clampToRange(value: number, range: Range): number {
-    if (value < range.min) {
-      return range.min;
-    }
-    if (value > range.max) {
-      return range.max;
-    }
-    return value;
   }
 }

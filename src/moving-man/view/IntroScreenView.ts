@@ -37,6 +37,10 @@ export class IntroScreenView extends ScreenView {
   public constructor(model: MovingManModel, providedOptions: IntroScreenViewOptions) {
     super(providedOptions);
 
+    // Permanent for the sim's lifetime; declare that so the collision-sound emitter listener
+    // and the child controls' model links are not read as unmanaged leaks.
+    this.isDisposable = false;
+
     const layoutBounds = this.layoutBounds;
 
     addCollisionSounds(model.movingMan.collideEmitter);
@@ -118,6 +122,19 @@ export class IntroScreenView extends ScreenView {
       playPauseButton,
       resetAllButton,
       comboListParent,
+    ];
+
+    // Explicit traversal order for keyboard/screen-reader users. ScreenView forbids setting
+    // pdomOrder on itself, so route through the standard play-area and control-area sections:
+    // the man is the simulation content; the quantity controls, wall toggle, function chooser,
+    // play/pause and Reset All are controls. (comboListParent is just the popup layer.)
+    this.pdomPlayAreaNode.pdomOrder = [playArea];
+    this.pdomControlAreaNode.pdomOrder = [
+      controlsColumn,
+      wallsCheckbox,
+      functionComboBox,
+      playPauseButton,
+      resetAllButton,
     ];
   }
 }

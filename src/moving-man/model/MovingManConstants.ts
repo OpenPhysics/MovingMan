@@ -52,12 +52,6 @@ const MovingManConstants = {
   POSITION_RANGE: new Range(-10, 10),
   VELOCITY_RANGE: new Range(-16, 16),
   ACCELERATION_RANGE: new Range(-60, 60),
-  PLAYBACK_SPEED_RANGE: new Range(0.2, 4),
-
-  // ── Chart y-axis ranges (from the original Charts tab) ───────────────────────
-  POSITION_CHART_RANGE: new Range(-10, 10),
-  VELOCITY_CHART_RANGE: new Range(-12, 12),
-  ACCELERATION_CHART_RANGE: new Range(-60, 60),
 
   // ── Chart zoom levels ────────────────────────────────────────────────────────
   // Each level is { max, step }: the axis extent and the tick/grid spacing at that

@@ -12,11 +12,16 @@ import stringsEs from "./strings_es.json";
 import stringsFr from "./strings_fr.json";
 
 // ── Compile-time key-parity check ─────────────────────────────────────────────
-// satisfies errors immediately if either locale file is missing keys from the other.
+// satisfies errors immediately if any locale file is missing keys from another. All three
+// shipped locales (en/fr/es) are mutually checked so none can silently drift.
 // biome-ignore lint/complexity/noVoid: intentional compile-time type assertion
 void (stringsEn satisfies typeof stringsFr);
 // biome-ignore lint/complexity/noVoid: intentional compile-time type assertion
 void (stringsFr satisfies typeof stringsEn);
+// biome-ignore lint/complexity/noVoid: intentional compile-time type assertion
+void (stringsEn satisfies typeof stringsEs);
+// biome-ignore lint/complexity/noVoid: intentional compile-time type assertion
+void (stringsEs satisfies typeof stringsEn);
 
 // ── Build the reactive string property tree ───────────────────────────────────
 const stringProperties = LocalizedString.getNestedStringProperties({
@@ -79,5 +84,13 @@ export class StringManager {
 
   public getChartStrings() {
     return stringProperties.chart;
+  }
+
+  public getPatternStrings() {
+    return stringProperties.patterns;
+  }
+
+  public getA11yStrings() {
+    return stringProperties.a11y;
   }
 }

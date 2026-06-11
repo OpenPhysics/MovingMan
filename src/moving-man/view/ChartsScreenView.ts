@@ -71,6 +71,10 @@ export class ChartsScreenView extends ScreenView {
   public constructor(model: MovingManModel, providedOptions: ChartsScreenViewOptions) {
     super(providedOptions);
 
+    // This screen view is permanent for the sim's lifetime; declare that so the collision-sound
+    // emitter listener and per-chart links registered here are not read as unmanaged leaks.
+    this.isDisposable = false;
+
     const layoutBounds = this.layoutBounds;
     const quantities = StringManager.getInstance().getQuantityStrings();
     const chartStrings = StringManager.getInstance().getChartStrings();
@@ -190,6 +194,21 @@ export class ChartsScreenView extends ScreenView {
       playbackControls,
       resetAllButton,
       comboListParent,
+    ];
+
+    // Explicit traversal order for keyboard/screen-reader users. ScreenView forbids setting
+    // pdomOrder on itself; instead we place nodes under the standard play-area and control-area
+    // sections so the heading structure stays consistent. The simulation content (the man and
+    // the chart rows) goes in the play area; the wall/zoom options, the function chooser, the
+    // playback transport, and Reset All go in the control area. (comboListParent is just the
+    // popup layer for functionComboBox.)
+    this.pdomPlayAreaNode.pdomOrder = [playArea, chartsColumn];
+    this.pdomControlAreaNode.pdomOrder = [
+      wallsCheckbox,
+      timeZoomBox,
+      functionComboBox,
+      playbackControls,
+      resetAllButton,
     ];
   }
 

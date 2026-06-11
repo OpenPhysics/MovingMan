@@ -33,7 +33,7 @@ export class MovingManModel implements TModel, ManContext {
   public readonly recordingProperty = new BooleanProperty(true);
   public readonly isPlayingProperty = new BooleanProperty(false);
   public readonly timeProperty = new NumberProperty(0, { units: secondsUnit });
-  public readonly furthestRecordedTimeProperty = new NumberProperty(0);
+  public readonly furthestRecordedTimeProperty = new NumberProperty(0, { units: secondsUnit });
   public readonly playbackSpeedProperty = new NumberProperty(1);
 
   // Vector-arrow visibility (shown on the man in the play area).

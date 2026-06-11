@@ -11,6 +11,7 @@ import { HBox, type Node, Text } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { ComboBox } from "scenerystack/sun";
 import { Tandem } from "scenerystack/tandem";
+import { StringManager } from "../../i18n/StringManager.js";
 import MovingManColors from "../../MovingManColors.js";
 import type { MovingManFunctionPreset } from "../model/functionPresets.js";
 import { FUNCTION_PRESETS } from "../model/functionPresets.js";
@@ -21,15 +22,21 @@ const ITEM_FONT = new PhetFont(13);
 
 export class FunctionComboBox extends HBox {
   /**
-   * @param model
+   * @param model - the sim model; the chosen preset is written to model.movingMan.functionProperty.
    * @param listParent - a Node high in the scene graph; the open list renders into it
    *                     so it sits above neighbouring controls.
+   * @param listPosition - whether the open list expands "above" or "below" the closed box.
    */
   public constructor(model: MovingManModel, listParent: Node, listPosition: "above" | "below" = "below") {
+    const controls = StringManager.getInstance().getControlStrings();
     const items: { value: MovingManFunctionPreset | null; createNode: () => Node; tandemName: string }[] = [
       {
         value: null,
-        createNode: () => new Text("Off", { font: ITEM_FONT, fill: MovingManColors.foregroundColorProperty }),
+        createNode: () =>
+          new Text(controls.functionOffStringProperty, {
+            font: ITEM_FONT,
+            fill: MovingManColors.foregroundColorProperty,
+          }),
         tandemName: "offItem",
       },
       ...FUNCTION_PRESETS.map((preset, index) => ({
@@ -48,7 +55,10 @@ export class FunctionComboBox extends HBox {
 
     super({
       spacing: 6,
-      children: [new Text("x(t):", { font: LABEL_FONT, fill: MovingManColors.positionProperty }), comboBox],
+      children: [
+        new Text(controls.functionLabelStringProperty, { font: LABEL_FONT, fill: MovingManColors.positionProperty }),
+        comboBox,
+      ],
     });
   }
 }

@@ -41,10 +41,15 @@ const MovingManColors = {
   manSkinProperty: profileColor("manSkin", "#f2c9a0", "#f2c9a0"),
   manStrokeProperty: profileColor("manStroke", BLACK, BLACK),
 
-  // Brick walls at the ends of the track (brick + mortar between courses).
+  // Brick walls at the ends of the track (brick + mortar between courses). The highlight is
+  // the soft top-of-course sheen painted over each brick.
   wallFillProperty: profileColor("wallFill", "#b5532c", "#b5532c"),
   wallMortarProperty: profileColor("wallMortar", "#e3c7a6", "#e3c7a6"),
   wallStrokeProperty: profileColor("wallStroke", new Color(90, 40, 20), new Color(90, 40, 20)),
+  wallBrickHighlightProperty: profileColor("wallBrickHighlight", "rgba(255,255,255,0.18)", "rgba(255,255,255,0.18)"),
+
+  // Translucent pill behind the play-area clock readout, for legibility over the sky gradient.
+  clockReadoutBackgroundProperty: profileColor("clockReadoutBackground", "rgba(255,255,255,0.7)", WHITE),
 
   // Charts.
   chartBackgroundProperty: profileColor("chartBackground", WHITE, WHITE),

@@ -19,7 +19,9 @@
     "showAcceleration": "Vector de aceleración"
   },
   "controls": {
-    "walls": "Paredes"
+    "walls": "Paredes",
+    "functionLabel": "x(t):",
+    "functionOff": "Apagado"
   },
   "playback": {
     "record": "Grabar",
@@ -33,5 +35,12 @@
   },
   "chart": {
     "time": "tiempo (s)"
+  },
+  "patterns": {
+    "quantityWithUnits": "{{quantity}} ({{units}})"
+  },
+  "a11y": {
+    "manAccessibleName": "Hombre en movimiento",
+    "timeCursorAccessibleName": "Cursor de tiempo del gráfico"
   }
 }

@@ -133,6 +133,9 @@ export class PlaybackControls extends HBox {
       spacing: CONTROLS_SPACING,
       align: "center",
       children: [recordPlaybackGroup, transport, eraserButton],
+      // Permanent per-screen transport; never disposed, so the model mirror links above are
+      // lifetime-scoped by design rather than an unmanaged leak.
+      isDisposable: false,
     });
   }
 }

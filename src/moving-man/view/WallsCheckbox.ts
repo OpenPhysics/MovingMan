@@ -26,6 +26,8 @@ export class WallsCheckbox extends Panel {
       cornerRadius: 6,
       xMargin: 8,
       yMargin: 6,
+      // Permanent per-screen control; never disposed (consistent with the other view panels).
+      isDisposable: false,
     });
   }
 }

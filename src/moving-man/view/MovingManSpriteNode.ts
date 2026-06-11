@@ -10,9 +10,10 @@
 
 import { Matrix3 } from "scenerystack/dot";
 import { Shape } from "scenerystack/kite";
-import { DragListener, Image, Node, Path } from "scenerystack/scenery";
+import { DragListener, Image, KeyboardDragListener, Node, Path } from "scenerystack/scenery";
 import { ArrowNode } from "scenerystack/scenery-phet";
 import { Animation, Easing } from "scenerystack/twixt";
+import { StringManager } from "../../i18n/StringManager.js";
 import MovingManColors from "../../MovingManColors.js";
 import walkingImageUrl from "../images/man-left.gif";
 import standingImageUrl from "../images/man-standing.gif";
@@ -66,7 +67,15 @@ export type MovingManSpriteNodeOptions = {
 
 export class MovingManSpriteNode extends Node {
   public constructor(model: MovingManModel, options: MovingManSpriteNodeOptions) {
-    super({ cursor: "pointer" });
+    super({
+      cursor: "pointer",
+      // Permanent per-screen object; never disposed (the model links and crash Animation below
+      // are lifetime-scoped). Expose the man to the PDOM as a focusable, keyboard-draggable control.
+      isDisposable: false,
+      tagName: "div",
+      focusable: true,
+      accessibleName: StringManager.getInstance().getA11yStrings().manAccessibleNameStringProperty,
+    });
 
     const {
       transform,
@@ -212,22 +221,44 @@ export class MovingManSpriteNode extends Node {
       crashAnimation.start();
     });
 
+    // Picking the man up (pointer or keyboard) drives him from position and, on the Charts
+    // screen, starts recording over the current cursor and begins playing.
+    const startPositionDrive = (): void => {
+      man.setPositionDriven();
+      if (!(model.noRecording || model.recordingProperty.value)) {
+        model.record();
+      }
+      if (!model.isPlayingProperty.value) {
+        model.play();
+      }
+    };
+
     // Dragging the man drives him from position (and, on the Charts screen, records).
     this.addInputListener(
       new DragListener({
-        start: () => {
-          man.setPositionDriven();
-          if (!(model.noRecording || model.recordingProperty.value)) {
-            model.record();
-          }
-          if (!model.isPlayingProperty.value) {
-            model.play();
-          }
-        },
+        start: startPositionDrive,
         drag: (event) => {
           const localX = this.globalToParentPoint(event.pointer.point).x;
           man.setMousePosition(transform.viewToModelX(localX));
           man.setPositionDriven();
+        },
+      }),
+    );
+
+    // Keyboard equivalent: Left/Right arrows (Shift for a finer step) move the man along the
+    // track. With no view transform on the listener, modelDelta is the view-pixel delta, so
+    // convert it to model meters via the play area's pixels-per-meter scale.
+    this.addInputListener(
+      new KeyboardDragListener({
+        keyboardDragDirection: "leftRight",
+        dragDelta: 6,
+        shiftDragDelta: 2,
+        dragSpeed: 300,
+        shiftDragSpeed: 120,
+        start: startPositionDrive,
+        drag: (_event, listener) => {
+          man.setPositionDriven();
+          man.setMousePosition(man.getMousePosition() + listener.modelDelta.x / transform.pixelsPerMeter);
         },
       }),
     );
