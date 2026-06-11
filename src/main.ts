@@ -19,7 +19,6 @@ import { onReadyToLaunch, PreferencesModel, Sim } from "scenerystack/sim";
 import { Tandem } from "scenerystack/tandem";
 import { StringManager } from "./i18n/StringManager.js";
 import MovingManColors from "./MovingManColors.js";
-import movingMan from "./MovingManNamespace.js";
 import { ChartsScreen } from "./moving-man/ChartsScreen.js";
 import { IntroScreen } from "./moving-man/IntroScreen.js";
 
@@ -57,6 +56,5 @@ onReadyToLaunch(() => {
   };
 
   const sim = new Sim(stringManager.getTitleStringProperty(), screens, simOptions);
-  movingMan.register("sim", sim);
   sim.start();
 });

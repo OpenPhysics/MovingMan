@@ -1,10 +1,10 @@
-import { Color, ProfileColorProperty } from "scenerystack";
-import movingMan from "./MovingManNamespace.js";
+import { Color, ProfileColorProperty } from "scenerystack/scenery";
+import MovingManNamespace from "./MovingManNamespace.js";
 
 const { BLACK, WHITE } = Color;
 
 function profileColor(name: string, def: Color | string, projector: Color | string): ProfileColorProperty {
-  return new ProfileColorProperty(movingMan, name, { default: def, projector });
+  return new ProfileColorProperty(MovingManNamespace, name, { default: def, projector });
 }
 
 // ── Sky / ground scenery ──────────────────────────────────────────────────────
@@ -52,7 +52,5 @@ const MovingManColors = {
   chartBorderProperty: profileColor("chartBorder", new Color(120, 120, 120), new Color(120, 120, 120)),
   chartCursorProperty: profileColor("chartCursor", "rgba(0,0,0,0.45)", "rgba(0,0,0,0.45)"),
 };
-
-movingMan.register("MovingManColors", MovingManColors);
 
 export default MovingManColors;

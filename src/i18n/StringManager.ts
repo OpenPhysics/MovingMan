@@ -5,8 +5,8 @@
  * Provides access to localized strings for all components.
  */
 
-import { LocalizedString, type ReadOnlyProperty } from "scenerystack";
-import movingMan from "../MovingManNamespace.js";
+import type { ReadOnlyProperty } from "scenerystack/axon";
+import { LocalizedString } from "scenerystack/chipper";
 import stringsEn from "./strings_en.json";
 import stringsEs from "./strings_es.json";
 import stringsFr from "./strings_fr.json";
@@ -18,28 +18,29 @@ void (stringsEn satisfies typeof stringsFr);
 // biome-ignore lint/complexity/noVoid: intentional compile-time type assertion
 void (stringsFr satisfies typeof stringsEn);
 
+// ── Build the reactive string property tree ───────────────────────────────────
+const stringProperties = LocalizedString.getNestedStringProperties({
+  en: stringsEn,
+  fr: stringsFr,
+  es: stringsEs,
+});
+
 export class StringManager {
-  private static instance: StringManager;
-  private readonly stringProperties;
+  private static instance: StringManager | null = null;
 
   private constructor() {
-    this.stringProperties = LocalizedString.getNestedStringProperties({
-      en: stringsEn,
-      fr: stringsFr,
-      es: stringsEs,
-    });
+    // Private — obtain via getInstance()
   }
 
   public static getInstance(): StringManager {
-    if (!StringManager.instance) {
+    if (StringManager.instance === null) {
       StringManager.instance = new StringManager();
-      movingMan.register("StringManager", StringManager.instance);
     }
     return StringManager.instance;
   }
 
   public getTitleStringProperty(): ReadOnlyProperty<string> {
-    return this.stringProperties.titleStringProperty;
+    return stringProperties.titleStringProperty;
   }
 
   public getScreenNames(): {
@@ -47,36 +48,36 @@ export class StringManager {
     chartsStringProperty: ReadOnlyProperty<string>;
   } {
     return {
-      introStringProperty: this.stringProperties.screens.introStringProperty,
-      chartsStringProperty: this.stringProperties.screens.chartsStringProperty,
+      introStringProperty: stringProperties.screens.introStringProperty,
+      chartsStringProperty: stringProperties.screens.chartsStringProperty,
     };
   }
 
   public getQuantityStrings() {
-    return this.stringProperties.quantities;
+    return stringProperties.quantities;
   }
 
   public getUnitStrings() {
-    return this.stringProperties.units;
+    return stringProperties.units;
   }
 
   public getVectorStrings() {
-    return this.stringProperties.vectors;
+    return stringProperties.vectors;
   }
 
   public getControlStrings() {
-    return this.stringProperties.controls;
+    return stringProperties.controls;
   }
 
   public getPlaybackStrings() {
-    return this.stringProperties.playback;
+    return stringProperties.playback;
   }
 
   public getClockStrings() {
-    return this.stringProperties.clock;
+    return stringProperties.clock;
   }
 
   public getChartStrings() {
-    return this.stringProperties.chart;
+    return stringProperties.chart;
   }
 }
