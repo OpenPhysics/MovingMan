@@ -51,6 +51,7 @@ export class FunctionComboBox extends HBox {
       listPosition,
       xMargin: 8,
       yMargin: 4,
+      accessibleName: controls.functionLabelStringProperty,
     });
 
     super({

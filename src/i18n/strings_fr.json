@@ -49,6 +49,7 @@
     },
     "currentDetails": "L'homme est à la position {{position}} mètres, se déplaçant à {{velocity}} mètres par seconde avec une accélération de {{acceleration}} mètres par seconde carrée. La lecture est {{state}}.",
     "playingLabel": "en cours",
-    "pausedLabel": "en pause"
+    "pausedLabel": "en pause",
+    "recordModeAccessibleName": "Mode enregistrement ou lecture"
   }
 }

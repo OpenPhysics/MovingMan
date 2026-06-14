@@ -53,6 +53,7 @@ function labelText(stringProperty: TReadOnlyProperty<string>): Node {
 export class PlaybackControls extends HBox {
   public constructor(model: MovingManModel) {
     const playback = StringManager.getInstance().getPlaybackStrings();
+    const a11y = StringManager.getInstance().getA11yStrings();
 
     // ── Record / Playback radio bound to a side-effecting wrapper property ────
     // We can't bind the radio directly to recordingProperty because flipping it must
@@ -82,6 +83,7 @@ export class PlaybackControls extends HBox {
         orientation: "vertical",
         spacing: RADIO_BUTTON_SPACING,
         radioButtonOptions: { radius: RADIO_BUTTON_RADIUS, stroke: MovingManColors.foregroundColorProperty },
+        accessibleName: a11y.recordModeAccessibleNameStringProperty,
       },
     );
 

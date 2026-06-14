@@ -49,6 +49,7 @@
     },
     "currentDetails": "El hombre está en la posición {{position}} metros, moviéndose a {{velocity}} metros por segundo con una aceleración de {{acceleration}} metros por segundo al cuadrado. La reproducción está {{state}}.",
     "playingLabel": "en marcha",
-    "pausedLabel": "en pausa"
+    "pausedLabel": "en pausa",
+    "recordModeAccessibleName": "Modo de grabación o reproducción"
   }
 }
