@@ -1,16 +1,17 @@
 import { Screen, type ScreenOptions } from "scenerystack/sim";
 import type { Tandem } from "scenerystack/tandem";
+import type { MovingManPreferencesModel } from "../preferences/MovingManPreferencesModel.js";
 import { MovingManModel } from "./model/MovingManModel.js";
 import { IntroScreenIcon } from "./view/IntroScreenIcon.js";
 import { IntroScreenView } from "./view/IntroScreenView.js";
 import { MovingManKeyboardHelpContent } from "./view/MovingManKeyboardHelpContent.js";
 
-type IntroScreenOptions = ScreenOptions & { tandem: Tandem };
+type IntroScreenOptions = ScreenOptions & { tandem: Tandem; preferences: MovingManPreferencesModel };
 
 export class IntroScreen extends Screen<MovingManModel, IntroScreenView> {
   public constructor(options: IntroScreenOptions) {
     super(
-      () => new MovingManModel({ noRecording: true }),
+      () => new MovingManModel({ noRecording: true, preferences: options.preferences }),
       (model) => new IntroScreenView(model, { tandem: options.tandem.createTandem("view") }),
       {
         ...options,

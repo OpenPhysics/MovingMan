@@ -13,6 +13,8 @@
 import { BooleanProperty, NumberProperty } from "scenerystack/axon";
 import type { TModel } from "scenerystack/joist";
 import { secondsUnit } from "scenerystack/scenery-phet";
+import type { MovingManPreferencesModel } from "../../preferences/MovingManPreferencesModel.js";
+import movingManQueryParameters from "../../preferences/movingManQueryParameters.js";
 import { closestIndex } from "./binarySearch.js";
 import type { ManState } from "./MovingMan.js";
 import { type ManContext, MovingMan } from "./MovingMan.js";
@@ -22,14 +24,14 @@ const { FIXED_DT, MAX_CATCHUP_STEPS, HALF_CONTAINER_WIDTH, MAX_TIME } = MovingMa
 
 type HistoryRecord = { time: number; wallsEnabled: boolean; man: ManState };
 
-export type MovingManModelOptions = { noRecording?: boolean };
+export type MovingManModelOptions = { noRecording?: boolean; preferences?: MovingManPreferencesModel };
 
 export class MovingManModel implements TModel, ManContext {
   public readonly halfContainerWidth = HALF_CONTAINER_WIDTH;
   public readonly maxTime = MAX_TIME;
   public readonly noRecording: boolean;
 
-  public readonly wallsEnabledProperty = new BooleanProperty(true);
+  public readonly wallsEnabledProperty = new BooleanProperty(movingManQueryParameters.wallsEnabled);
   public readonly recordingProperty = new BooleanProperty(true);
   public readonly isPlayingProperty = new BooleanProperty(false);
   public readonly timeProperty = new NumberProperty(0, { units: secondsUnit });
@@ -37,8 +39,8 @@ export class MovingManModel implements TModel, ManContext {
   public readonly playbackSpeedProperty = new NumberProperty(1);
 
   // Vector-arrow visibility (shown on the man in the play area).
-  public readonly showVelocityVectorProperty = new BooleanProperty(false);
-  public readonly showAccelerationVectorProperty = new BooleanProperty(false);
+  public readonly showVelocityVectorProperty = new BooleanProperty(movingManQueryParameters.showVelocityVector);
+  public readonly showAccelerationVectorProperty = new BooleanProperty(movingManQueryParameters.showAccelerationVector);
 
   public readonly movingMan: MovingMan;
 
@@ -47,8 +49,12 @@ export class MovingManModel implements TModel, ManContext {
   private time = 0;
   private timeAccumulator = 0;
 
+  private readonly preferences: MovingManPreferencesModel | undefined;
+
   public constructor(providedOptions?: MovingManModelOptions) {
     this.noRecording = providedOptions?.noRecording ?? false;
+    this.preferences = providedOptions?.preferences;
+    this.applyPreferences();
     if (this.noRecording) {
       this.recordingProperty.value = false;
     }
@@ -239,6 +245,19 @@ export class MovingManModel implements TModel, ManContext {
 
   // ── Reset ─────────────────────────────────────────────────────────────────────
 
+  /**
+   * Applies the simulation preferences (Preferences → Simulation). Called on
+   * construction and Reset All so the preference defaults take effect.
+   */
+  private applyPreferences(): void {
+    if (!this.preferences) {
+      return;
+    }
+    this.wallsEnabledProperty.value = this.preferences.wallsEnabledProperty.value;
+    this.showVelocityVectorProperty.value = this.preferences.showVelocityVectorProperty.value;
+    this.showAccelerationVectorProperty.value = this.preferences.showAccelerationVectorProperty.value;
+  }
+
   public reset(): void {
     this.pause();
     this.wallsEnabledProperty.reset();
@@ -256,6 +275,7 @@ export class MovingManModel implements TModel, ManContext {
     this.movingMan.motionStrategyProperty.reset();
     this.movingMan.setMousePosition(0);
 
+    this.applyPreferences();
     this.resetTimeAndHistory();
   }
 }

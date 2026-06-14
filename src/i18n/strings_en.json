@@ -51,5 +51,11 @@
     "playingLabel": "playing",
     "pausedLabel": "paused",
     "recordModeAccessibleName": "Record or playback mode"
+  },
+  "preferences": {
+    "title": "Simulation",
+    "wallsEnabled": "Walls Enabled",
+    "showVelocityVector": "Show Velocity Vector",
+    "showAccelerationVector": "Show Acceleration Vector"
   }
 }

@@ -25,18 +25,25 @@ import { StringManager } from "./i18n/StringManager.js";
 import MovingManColors from "./MovingManColors.js";
 import { ChartsScreen } from "./moving-man/ChartsScreen.js";
 import { IntroScreen } from "./moving-man/IntroScreen.js";
+import { MovingManPreferencesModel } from "./preferences/MovingManPreferencesModel.js";
+import { MovingManPreferencesNode } from "./preferences/MovingManPreferencesNode.js";
 
 onReadyToLaunch(() => {
   const stringManager = StringManager.getInstance();
   const screenNames = stringManager.getScreenNames();
 
+  // Simulation-specific preferences; initial values come from movingManQueryParameters.
+  const movingManPreferences = new MovingManPreferencesModel(Tandem.ROOT.createTandem("preferences"));
+
   const screens = [
     new IntroScreen({
+      preferences: movingManPreferences,
       name: screenNames.introStringProperty,
       tandem: Tandem.ROOT.createTandem("introScreen"),
       backgroundColorProperty: MovingManColors.backgroundColorProperty,
     }),
     new ChartsScreen({
+      preferences: movingManPreferences,
       name: screenNames.chartsStringProperty,
       tandem: Tandem.ROOT.createTandem("chartsScreen"),
       backgroundColorProperty: MovingManColors.backgroundColorProperty,
@@ -48,6 +55,13 @@ onReadyToLaunch(() => {
       visualOptions: {
         supportsProjectorMode: true,
         supportsInteractiveHighlights: true,
+      },
+      simulationOptions: {
+        customPreferences: [
+          {
+            createContent: (tandem: Tandem) => new MovingManPreferencesNode(movingManPreferences, tandem),
+          },
+        ],
       },
       localizationOptions: {
         supportsDynamicLocale: true,
