@@ -24,6 +24,7 @@ import MovingManConstants from "../model/MovingManConstants.js";
 import type { MovingManModel } from "../model/MovingManModel.js";
 import { ChartNode, type ZoomLevel } from "./ChartNode.js";
 import { FunctionComboBox } from "./FunctionComboBox.js";
+import { MovingManScreenSummaryContent } from "./MovingManScreenSummaryContent.js";
 import { addCollisionSounds } from "./MovingManSounds.js";
 import { PlayAreaNode } from "./PlayAreaNode.js";
 import { PlaybackControls } from "./PlaybackControls.js";
@@ -69,7 +70,7 @@ export class ChartsScreenView extends ScreenView {
   private readonly chartNodes: ChartNode[] = [];
 
   public constructor(model: MovingManModel, providedOptions: ChartsScreenViewOptions) {
-    super(providedOptions);
+    super({ ...providedOptions, screenSummaryContent: new MovingManScreenSummaryContent(model) });
 
     // This screen view is permanent for the sim's lifetime; declare that so the collision-sound
     // emitter listener and per-chart links registered here are not read as unmanaged leaks.

@@ -16,6 +16,14 @@ SceneryStack port of the PhET Java Moving Man simulation. Two screens: Introduct
 | Sounds | `MovingManSounds.ts` — wall collision thud + grunt |
 | Colors | `MovingManColors.ts`, `MovingManNamespace.ts` |
 
+## Accessibility
+
+Follows the shared [OpenPhysics accessibility convention](https://github.com/OpenPhysics/OpenPhysics/blob/main/ACCESSIBILITY.md).
+Both screens register the shared `MovingManScreenSummaryContent` (live current-details: the man's
+position/velocity/acceleration + playback state) via the `screenSummaryContent` super-option, and
+order the PDOM through `pdomPlayAreaNode`/`pdomControlAreaNode`. A11y strings live under `a11y` in
+each locale JSON, via `StringManager.getA11yStrings()`.
+
 ## Notable port choices
 
 - Free-form x(t) formula entry replaced by **x(t) preset menu** (`FunctionComboBox`) — SceneryStack has no built-in text input

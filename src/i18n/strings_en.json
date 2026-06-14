@@ -41,6 +41,14 @@
   },
   "a11y": {
     "manAccessibleName": "Moving man",
-    "timeCursorAccessibleName": "Graph time cursor"
+    "timeCursorAccessibleName": "Graph time cursor",
+    "screenSummary": {
+      "playArea": "The play area shows a man who moves along a one-dimensional track between two walls. His position, velocity, and acceleration can be controlled and visualized.",
+      "controlArea": "The controls set the man's position, velocity, and acceleration or choose a preset motion, toggle the walls, and play, pause, record, or replay the motion. A Reset All button returns the simulation to its starting state.",
+      "interactionHint": "Set the man's position, velocity, or acceleration and play the simulation to watch him move."
+    },
+    "currentDetails": "The man is at position {{position}} meters, moving at {{velocity}} meters per second with an acceleration of {{acceleration}} meters per second squared. Playback is {{state}}.",
+    "playingLabel": "playing",
+    "pausedLabel": "paused"
   }
 }

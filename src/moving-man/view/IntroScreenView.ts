@@ -17,6 +17,7 @@ import type { Tandem } from "scenerystack/tandem";
 import MovingManConstants from "../model/MovingManConstants.js";
 import type { MovingManModel } from "../model/MovingManModel.js";
 import { FunctionComboBox } from "./FunctionComboBox.js";
+import { MovingManScreenSummaryContent } from "./MovingManScreenSummaryContent.js";
 import { addCollisionSounds } from "./MovingManSounds.js";
 import { PlayAreaNode } from "./PlayAreaNode.js";
 import { VariableControl } from "./VariableControl.js";
@@ -35,7 +36,7 @@ export type IntroScreenViewOptions = ScreenViewOptions & { tandem: Tandem };
 
 export class IntroScreenView extends ScreenView {
   public constructor(model: MovingManModel, providedOptions: IntroScreenViewOptions) {
-    super(providedOptions);
+    super({ ...providedOptions, screenSummaryContent: new MovingManScreenSummaryContent(model) });
 
     // Permanent for the sim's lifetime; declare that so the collision-sound emitter listener
     // and the child controls' model links are not read as unmanaged leaks.

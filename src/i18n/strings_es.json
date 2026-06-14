@@ -41,6 +41,14 @@
   },
   "a11y": {
     "manAccessibleName": "Hombre en movimiento",
-    "timeCursorAccessibleName": "Cursor de tiempo del gráfico"
+    "timeCursorAccessibleName": "Cursor de tiempo del gráfico",
+    "screenSummary": {
+      "playArea": "El área de juego muestra un hombre que se mueve a lo largo de una pista unidimensional entre dos paredes. Su posición, velocidad y aceleración se pueden controlar y visualizar.",
+      "controlArea": "Los controles ajustan la posición, la velocidad y la aceleración del hombre o eligen un movimiento predefinido, activan las paredes, y reproducen, pausan, graban o reproducen el movimiento. Un botón Restablecer todo devuelve la simulación a su estado inicial.",
+      "interactionHint": "Ajusta la posición, la velocidad o la aceleración del hombre y reproduce la simulación para verlo moverse."
+    },
+    "currentDetails": "El hombre está en la posición {{position}} metros, moviéndose a {{velocity}} metros por segundo con una aceleración de {{acceleration}} metros por segundo al cuadrado. La reproducción está {{state}}.",
+    "playingLabel": "en marcha",
+    "pausedLabel": "en pausa"
   }
 }

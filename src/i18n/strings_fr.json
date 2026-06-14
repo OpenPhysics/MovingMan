@@ -41,6 +41,14 @@
   },
   "a11y": {
     "manAccessibleName": "Homme en mouvement",
-    "timeCursorAccessibleName": "Curseur temporel du graphique"
+    "timeCursorAccessibleName": "Curseur temporel du graphique",
+    "screenSummary": {
+      "playArea": "La zone de jeu montre un homme qui se déplace le long d'une piste à une dimension entre deux murs. Sa position, sa vitesse et son accélération peuvent être contrôlées et visualisées.",
+      "controlArea": "Les commandes règlent la position, la vitesse et l'accélération de l'homme ou choisissent un mouvement prédéfini, activent les murs, et lisent, mettent en pause, enregistrent ou rejouent le mouvement. Un bouton Tout réinitialiser ramène la simulation à son état initial.",
+      "interactionHint": "Réglez la position, la vitesse ou l'accélération de l'homme et lancez la simulation pour le voir se déplacer."
+    },
+    "currentDetails": "L'homme est à la position {{position}} mètres, se déplaçant à {{velocity}} mètres par seconde avec une accélération de {{acceleration}} mètres par seconde carrée. La lecture est {{state}}.",
+    "playingLabel": "en cours",
+    "pausedLabel": "en pause"
   }
 }
