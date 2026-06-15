@@ -9,7 +9,9 @@
  * Follows the OpenPhysics accessibility convention; see the canonical
  * TemplateSingleSim/SimScreenSummaryContent.ts.
  */
+
 import { DerivedProperty } from "scenerystack/axon";
+import { toFixed } from "scenerystack/dot";
 import { StringUtils } from "scenerystack/phetcommon";
 import { ScreenSummaryContent } from "scenerystack/sim";
 import { StringManager } from "../../i18n/StringManager.js";
@@ -31,9 +33,9 @@ export class MovingManScreenSummaryContent extends ScreenSummaryContent {
       ],
       (template, playingLabel, pausedLabel, position, velocity, acceleration, isPlaying) =>
         StringUtils.fillIn(template, {
-          position: position.toFixed(1),
-          velocity: velocity.toFixed(1),
-          acceleration: acceleration.toFixed(1),
+          position: toFixed(position, 1),
+          velocity: toFixed(velocity, 1),
+          acceleration: toFixed(acceleration, 1),
           state: isPlaying ? playingLabel : pausedLabel,
         }),
     );
