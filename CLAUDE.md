@@ -18,7 +18,7 @@ SceneryStack port of the PhET Java Moving Man simulation. Two screens: Introduct
 
 ## Accessibility
 
-Follows the shared [OpenPhysics accessibility convention](https://github.com/OpenPhysics/OpenPhysics/blob/main/ACCESSIBILITY.md).
+Follows the shared [OpenPhysics accessibility convention](https://github.com/OpenPhysics/Baton/blob/main/ACCESSIBILITY.md).
 Both screens register the shared `MovingManScreenSummaryContent` (live current-details: the man's
 position/velocity/acceleration + playback state) via the `screenSummaryContent` super-option, and
 order the PDOM through `pdomPlayAreaNode`/`pdomControlAreaNode`. A11y strings live under `a11y` in
