@@ -1,7 +1,7 @@
 {
   "name": "movingman",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.9.0",
   "type": "module",
   "description": "SceneryStack port of the PhET Java 'Moving Man' simulation. Explore 1D kinematics by dragging a man or using position/velocity/acceleration sliders.",
   "license": "AGPL-3.0-or-later",
