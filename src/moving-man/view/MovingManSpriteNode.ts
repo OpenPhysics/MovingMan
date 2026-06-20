@@ -116,7 +116,7 @@ export class MovingManSpriteNode extends Node {
 
     // Soft ground shadow, kept on the ground (outside the bobbing figure).
     const shadow = new Path(Shape.ellipse(0, 0, figureWidth * 0.42, figureWidth * 0.12, 0), {
-      fill: "rgba(0,0,0,0.22)",
+      fill: MovingManColors.manShadowProperty,
       y: -2,
     });
 

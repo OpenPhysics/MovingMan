@@ -228,9 +228,11 @@ export class MovingManModel implements TModel, ManContext {
   /** Switch into playback mode, rewinding to the start. */
   public stopRecording(): void {
     this.pause();
+    this.prepareForPlayback();
     this.time = 0;
     this.timeProperty.value = 0;
     this.recordingProperty.value = false;
+    this.applyPlaybackState();
   }
 
   /** Scrub to a recorded time and show that frame (used by the chart cursor). */

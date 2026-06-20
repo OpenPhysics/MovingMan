@@ -191,7 +191,10 @@ export class PlayAreaNode extends Node {
     const brickWidth = width * 0.56;
     const highlight: TColor = MovingManColors.wallBrickHighlightProperty;
 
-    node.addChild(new Rectangle(0, 0, width, height, { fill: mortarFill }));
+    // Brick courses live in a clipped child node. The outline stroke is added to the
+    // parent so it is not clipped and renders at its full 1.5 px width.
+    const brickContent = new Node({ clipArea: Shape.roundRectangle(0, 0, width, height, 3, 3) });
+    brickContent.addChild(new Rectangle(0, 0, width, height, { fill: mortarFill }));
 
     let course = 0;
     for (let y = mortar; y < height - 1; y += courseHeight + mortar) {
@@ -207,14 +210,13 @@ export class PlayAreaNode extends Node {
         if (bw <= 0) {
           continue;
         }
-        node.addChild(new Rectangle(bx, y, bw, h, { fill: brickFill }));
-        node.addChild(new Rectangle(bx, y, bw, Math.max(1, h * 0.3), { fill: highlight }));
+        brickContent.addChild(new Rectangle(bx, y, bw, h, { fill: brickFill }));
+        brickContent.addChild(new Rectangle(bx, y, bw, Math.max(1, h * 0.3), { fill: highlight }));
       }
       course++;
     }
 
-    // Rounded outline + clip so the courses read as one tidy wall.
-    node.clipArea = Shape.roundRectangle(0, 0, width, height, 3, 3);
+    node.addChild(brickContent);
     node.addChild(new Rectangle(0, 0, width, height, { stroke: outline, lineWidth: 1.5, cornerRadius: 3 }));
     return node;
   }

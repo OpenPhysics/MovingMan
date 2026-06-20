@@ -36,8 +36,8 @@ function loadAudioBuffer(url: string): WrappedAudioBuffer {
     .then((audioBuffer) => {
       wrappedAudioBuffer.audioBufferProperty.value = audioBuffer;
     })
-    .catch(() => {
-      // A decode failure simply leaves this clip silent; nothing else to do.
+    .catch((err: unknown) => {
+      console.warn("MovingMan: failed to load audio", url, err);
     });
   return wrappedAudioBuffer;
 }

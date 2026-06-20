@@ -21,7 +21,15 @@
   "controls": {
     "walls": "Paredes",
     "functionLabel": "x(t):",
-    "functionOff": "Apagado"
+    "functionOff": "Apagado",
+    "presets": {
+      "linear": "3·t − 5",
+      "quadratic": "t² − 8",
+      "sine": "7·sin(t)",
+      "cosine": "7·cos(t)",
+      "fastSine": "5·sin(2·t)",
+      "sqrtLinear": "√(20·t) − 10"
+    }
   },
   "playback": {
     "record": "Grabar",
