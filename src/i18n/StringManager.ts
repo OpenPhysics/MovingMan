@@ -98,4 +98,17 @@ export class StringManager {
   public getPreferences() {
     return stringProperties.preferences;
   }
+
+  /** Preset combo-box labels in the same order as FUNCTION_PRESETS. */
+  public getPresetLabelProperties(): ReadOnlyProperty<string>[] {
+    const p = stringProperties.controls.presets;
+    return [
+      p.linearStringProperty,
+      p.quadraticStringProperty,
+      p.sineStringProperty,
+      p.cosineStringProperty,
+      p.fastSineStringProperty,
+      p.sqrtLinearStringProperty,
+    ];
+  }
 }

@@ -72,6 +72,7 @@ export class ChartNode extends Node {
   private readonly linePlot: LinePlot;
   private readonly cursorLine: Line;
   private readonly dataset: Vector2[] = [];
+  private datasetSize = 0;
   private readonly timeProperty: TReadOnlyProperty<number>;
 
   public constructor(model: MovingManModel, timeProperty: TReadOnlyProperty<number>, options: ChartNodeOptions) {
@@ -238,13 +239,13 @@ export class ChartNode extends Node {
           const max = model.furthestRecordedTimeProperty.value;
           const step = keysPressed.includes("shift") ? SCRUB_KEY_STEP_LARGE : SCRUB_KEY_STEP;
           let t = timeProperty.value;
-          if (keysPressed === "home") {
+          if (keysPressed.includes("home")) {
             t = 0;
-          } else if (keysPressed === "end") {
+          } else if (keysPressed.includes("end")) {
             t = max;
-          } else if (keysPressed.endsWith("arrowLeft")) {
+          } else if (keysPressed.includes("arrowLeft")) {
             t -= step;
-          } else if (keysPressed.endsWith("arrowRight")) {
+          } else if (keysPressed.includes("arrowRight")) {
             t += step;
           }
           model.setPlaybackTime(Math.max(0, Math.min(max, t)));
@@ -272,20 +273,35 @@ export class ChartNode extends Node {
    */
   public refresh(): void {
     const size = this.series.size();
-    this.dataset.length = size;
-    for (let i = 0; i < size; i++) {
-      const point = this.series.getPoint(i);
-      if (!point) {
-        continue;
+    if (size === this.datasetSize) {
+      return;
+    }
+    if (size < this.datasetSize) {
+      // Series was cleared; re-sync all points from scratch.
+      this.dataset.length = size;
+      for (let i = 0; i < size; i++) {
+        const point = this.series.getPoint(i);
+        if (!point) {
+          continue;
+        }
+        const existing = this.dataset[i];
+        if (existing) {
+          existing.x = point.time;
+          existing.y = point.value;
+        } else {
+          this.dataset[i] = new Vector2(point.time, point.value);
+        }
       }
-      const existing = this.dataset[i];
-      if (existing) {
-        existing.x = point.time;
-        existing.y = point.value;
-      } else {
-        this.dataset[i] = new Vector2(point.time, point.value);
+    } else {
+      // Series grew; only append the new tail.
+      for (let i = this.datasetSize; i < size; i++) {
+        const point = this.series.getPoint(i);
+        if (point) {
+          this.dataset.push(new Vector2(point.time, point.value));
+        }
       }
     }
+    this.datasetSize = size;
     this.linePlot.setDataSet(this.dataset);
   }
 

@@ -40,6 +40,7 @@ const MovingManColors = {
   manFillProperty: profileColor("manFill", "#3a78c9", "#2c5fa8"),
   manSkinProperty: profileColor("manSkin", "#f2c9a0", "#f2c9a0"),
   manStrokeProperty: profileColor("manStroke", BLACK, BLACK),
+  manShadowProperty: profileColor("manShadow", "rgba(0,0,0,0.22)", "rgba(0,0,0,0.15)"),
 
   // Brick walls at the ends of the track (brick + mortar between courses). The highlight is
   // the soft top-of-course sheen painted over each brick.

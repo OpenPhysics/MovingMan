@@ -208,10 +208,8 @@ export class MovingMan {
 
   /**
    * Run a single step against whichever driver is active, WITHOUT recording the frame time.
-   * Split out from update() so the wall-collision replay in updateFromAcceleration can re-run
-   * this frame at the same timestamp without pushing a second copy of `time` onto `times` — a
-   * duplicate would skew the centered-derivative time lookups (getTimeNTimeStepsAgo) for the
-   * next several frames if the user switched back to a differentiated driver.
+   * Split out from update() so time is pushed to `times` exactly once per step,
+   * keeping the centered-derivative lookups (getTimeNTimeStepsAgo) accurate.
    */
   private dispatchUpdate(time: number, delta: number): void {
     const preset = this.functionProperty.value;
@@ -344,19 +342,27 @@ export class MovingMan {
     const estVelocity = (this.velocityProperty.value + newVelocity) / 2;
     const wallResult = this.clampIfWalled(this.positionProperty.value + estVelocity * delta);
 
-    // A deceleration spike when crashing into a wall: switch to velocity-driven and
-    // rerun the step so the wall stops the man rather than the acceleration carrying on.
-    // Replay at the SAME time: the Java original rolls time back by dt and then re-adds
-    // it inside its step method, so the replayed frame lands on the original time. We
-    // re-dispatch via dispatchUpdate (not update()), which keeps the original `time` but
-    // does NOT re-push it onto `times` — re-running update() here would record this frame's
-    // timestamp twice. Passing `time - delta` (as the PIXI port did) would instead duplicate
-    // the previous frame's timestamp and skip this one, leaving a backtrack/kink on the
-    // charts and a one-frame desync from the recorded history at the crash.
     if (wallResult.collided) {
+      // Stop at the wall: record zero velocity and the wall position directly so the
+      // chart series have no spike. Zero acceleration too, then switch to velocity-driven
+      // so subsequent steps hold the man still until the user moves a slider.
+      const pos = wallResult.position;
       this.setVelocityDriven();
-      this.velocityProperty.value = newVelocity;
-      this.dispatchUpdate(time, delta);
+
+      this.accelerationModelSeries.add(acceleration, time);
+      this.accelerationGraphSeries.add(acceleration, time);
+      this.accelerationProperty.value = 0;
+
+      this.velocityModelSeries.add(0, time);
+      this.velocityGraphSeries.add(0, time);
+      this.velocityProperty.value = 0;
+
+      this.positionModelSeries.add(pos, time);
+      this.positionGraphSeries.add(pos, time);
+      this.positionProperty.value = pos;
+      this.setMousePosition(pos);
+
+      this.collideEmitter.emit();
       return;
     }
 
@@ -371,11 +377,6 @@ export class MovingMan {
     this.setMousePosition(wallResult.position);
     this.positionProperty.value = wallResult.position;
     this.velocityProperty.value = newVelocity;
-
-    if (wallResult.collided) {
-      this.velocityProperty.value = 0;
-      this.accelerationProperty.value = 0;
-    }
   }
 
   // ── Pointer input ─────────────────────────────────────────────────────────────

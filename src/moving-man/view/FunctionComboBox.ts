@@ -39,11 +39,15 @@ export class FunctionComboBox extends HBox {
           }),
         tandemName: "offItem",
       },
-      ...FUNCTION_PRESETS.map((preset, index) => ({
-        value: preset as MovingManFunctionPreset | null,
-        createNode: () => new Text(preset.labelString, { font: ITEM_FONT, fill: MovingManColors.positionProperty }),
-        tandemName: `preset${index}Item`,
-      })),
+      ...FUNCTION_PRESETS.map((preset, index) => {
+        const labelProperty = StringManager.getInstance().getPresetLabelProperties()[index];
+        return {
+          value: preset as MovingManFunctionPreset | null,
+          createNode: () =>
+            new Text(labelProperty ?? preset.labelString, { font: ITEM_FONT, fill: MovingManColors.positionProperty }),
+          tandemName: `preset${index}Item`,
+        };
+      }),
     ];
 
     const comboBox = new ComboBox<MovingManFunctionPreset | null>(model.movingMan.functionProperty, items, listParent, {
