@@ -115,6 +115,10 @@ export class MovingManModel implements TModel, ManContext {
     this.timeProperty.value = this.time;
 
     if (this.recordingProperty.value) {
+      if (this.time > this.maxTime) {
+        this.pause();
+        return;
+      }
       this.movingMan.update(this.time, delta);
       this.recordState();
       this.furthestRecordedTimeProperty.value = this.time;
