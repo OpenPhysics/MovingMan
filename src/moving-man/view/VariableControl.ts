@@ -254,7 +254,10 @@ export class VariableControl extends Panel {
     if (VariableControl.cachedVectorCheckboxHeight === null) {
       const dummyVisibleProp = new BooleanProperty(false);
       const dummyLabelProp = new StringProperty("X");
-      VariableControl.cachedVectorCheckboxHeight = VariableControl.makeVectorCheckbox(dummyVisibleProp, dummyLabelProp).height;
+      VariableControl.cachedVectorCheckboxHeight = VariableControl.makeVectorCheckbox(
+        dummyVisibleProp,
+        dummyLabelProp,
+      ).height;
       dummyVisibleProp.dispose();
       dummyLabelProp.dispose();
     }

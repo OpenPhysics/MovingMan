@@ -37,6 +37,7 @@ function loadAudioBuffer(url: string): WrappedAudioBuffer {
       wrappedAudioBuffer.audioBufferProperty.value = audioBuffer;
     })
     .catch((err: unknown) => {
+      // biome-ignore lint/suspicious/noConsole: surface audio-load failures
       console.warn("MovingMan: failed to load audio", url, err);
     });
   return wrappedAudioBuffer;
