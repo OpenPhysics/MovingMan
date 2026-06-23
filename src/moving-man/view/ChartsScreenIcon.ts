@@ -12,6 +12,7 @@
  */
 
 import { Shape } from "scenerystack/kite";
+import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import { Node, Path, Rectangle, type TColor } from "scenerystack/scenery";
 import { Screen, ScreenIcon, type ScreenIconOptions } from "scenerystack/sim";
 import MovingManColors from "../../MovingManColors.js";
@@ -91,11 +92,15 @@ function createIconNode(): Node {
 
 export class ChartsScreenIcon extends ScreenIcon {
   public constructor(providedOptions?: ScreenIconOptions) {
-    super(createIconNode(), {
-      maxIconWidthProportion: 1,
-      maxIconHeightProportion: 1,
-      fill: MovingManColors.chartBackgroundProperty,
-      ...providedOptions,
-    });
+    const options = optionize<ScreenIconOptions, EmptySelfOptions, ScreenIconOptions>()(
+      {
+        maxIconWidthProportion: 1,
+        maxIconHeightProportion: 1,
+        fill: MovingManColors.chartBackgroundProperty,
+      },
+      providedOptions,
+    );
+
+    super(createIconNode(), options);
   }
 }

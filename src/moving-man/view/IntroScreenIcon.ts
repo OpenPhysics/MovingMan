@@ -6,6 +6,7 @@
  * and green acceleration arrows streaming out to signal motion.
  */
 
+import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import { Image, LinearGradient, Node, Rectangle } from "scenerystack/scenery";
 import { ArrowNode } from "scenerystack/scenery-phet";
 import { Screen, ScreenIcon, type ScreenIconOptions } from "scenerystack/sim";
@@ -58,11 +59,15 @@ function createIconNode(): Node {
 
 export class IntroScreenIcon extends ScreenIcon {
   public constructor(providedOptions?: ScreenIconOptions) {
-    super(createIconNode(), {
-      maxIconWidthProportion: 1,
-      maxIconHeightProportion: 1,
-      fill: MovingManColors.skyBottomProperty,
-      ...providedOptions,
-    });
+    const options = optionize<ScreenIconOptions, EmptySelfOptions, ScreenIconOptions>()(
+      {
+        maxIconWidthProportion: 1,
+        maxIconHeightProportion: 1,
+        fill: MovingManColors.skyBottomProperty,
+      },
+      providedOptions,
+    );
+
+    super(createIconNode(), options);
   }
 }
