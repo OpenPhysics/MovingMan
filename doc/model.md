@@ -9,8 +9,9 @@ terms appropriate for an educator. It is the companion to
 The simulation teaches **one-dimensional kinematics** through a man walking back and forth along a
 horizontal line between two walls. Students set the man's position, velocity, or acceleration and watch
 the other quantities evolve on synchronized charts, connecting graphs of position, velocity, and
-acceleration versus time. An **Intro** screen shows live motion with rolling chart windows, and a
-**Charts** screen adds full record/playback so students can scrub through recorded history.
+acceleration versus time. The **Intro** screen focuses on live motion in the play area with sliders
+and controls (no charts); the **Charts** screen adds x/v/a versus time charts plus full
+record/playback so students can scrub through recorded history.
 
 ## Quantities and units
 

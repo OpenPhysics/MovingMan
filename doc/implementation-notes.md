@@ -8,7 +8,7 @@ The Moving Man simulation is structured using a Model-View pattern across two sc
 
 The simulation follows a modular architecture with **two screens**:
 
-- **Intro screen** (`IntroScreen`): Live motion with rolling chart windows; `MovingManModel` created with `noRecording: true`
+- **Intro screen** (`IntroScreen`): Play area and quantity controls only (no charts); `MovingManModel` created with `noRecording: true`
 - **Charts screen** (`ChartsScreen`): Full record/playback with history scrubbing
 
 Each screen has its own model instance and view:
@@ -39,9 +39,9 @@ Each model component has a single responsibility:
 
 ### Physics Simulation Approach
 
-Integration advances the man's state according to the active motion strategy. Wall collisions reverse velocity when walls are enabled.
+Integration advances the man's state according to the active motion strategy. Wall collisions stop the man at the boundary (velocity zeroed) when walls are enabled.
 
-On the Charts screen, state history supports record, pause, and playback scrubbing. The Intro screen uses live rolling windows instead of stored history.
+On the Charts screen, state history supports record, pause, and playback scrubbing. The Intro screen disables recording (no stored history).
 
 Constants live in `MovingManConstants.ts`.
 
@@ -69,7 +69,7 @@ Colors are defined in `MovingManColors.ts`. Chart series colors should come from
 
 ### Performance Optimizations
 
-- Chart data uses fixed rolling windows on the Intro screen
+- Chart series on the Charts screen use time-limited rolling windows
 - History storage on the Charts screen is bounded by reset
 
 Note that no dispose functions have been used, which should be addressed.
