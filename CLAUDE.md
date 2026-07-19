@@ -53,6 +53,7 @@ each locale JSON, via `StringManager.getA11yStrings()`.
 ## Compliance carve-outs
 
 - **Nested constants:** `src/MovingManConstants.ts` — PhET-port kinematics/layout constants next to the model.
+- **Domain clock:** recording/playback uses the model's own `recordingProperty` / `isPlayingProperty` / `timeProperty` instead of composing fleet-standard `TimeModel` (`src/common/TimeModel.ts` is present for shared reference only).
 
 ## Testing
 
