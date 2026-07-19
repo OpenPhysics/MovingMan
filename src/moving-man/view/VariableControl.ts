@@ -111,6 +111,14 @@ export class VariableControl extends Panel {
       titleText.font = strategy === bundle.strategy ? TITLE_FONT_BOLD : TITLE_FONT_NORMAL;
     });
 
+    const a11y = StringManager.getInstance().getA11yStrings();
+    const controlAccessibleName =
+      kind === "position"
+        ? a11y.positionControlStringProperty
+        : kind === "velocity"
+          ? a11y.velocityControlStringProperty
+          : a11y.accelerationControlStringProperty;
+
     const numberControl = new NumberControl(titleText, controlProperty, range, {
       delta: NUMBER_CONTROL_DELTA,
       layoutFunction: NumberControl.createLayoutFunction1({
@@ -126,6 +134,7 @@ export class VariableControl extends Panel {
         thumbSize: new Dimension2(14, 22),
       },
       titleNodeOptions: { font: TITLE_FONT_NORMAL },
+      accessibleName: controlAccessibleName,
     });
 
     // While a preset function drives position, the position control is read-only

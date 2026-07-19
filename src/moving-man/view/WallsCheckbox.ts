@@ -19,7 +19,11 @@ export class WallsCheckbox extends Panel {
       font: LABEL_FONT,
       fill: MovingManColors.foregroundColorProperty,
     });
-    const checkbox = new Checkbox(model.wallsEnabledProperty, label, { boxWidth: 16 });
+    const a11y = StringManager.getInstance().getA11yStrings();
+    const checkbox = new Checkbox(model.wallsEnabledProperty, label, {
+      boxWidth: 16,
+      accessibleName: a11y.wallsCheckboxStringProperty,
+    });
     super(checkbox, {
       fill: MovingManColors.panelFillProperty,
       stroke: MovingManColors.panelStrokeProperty,

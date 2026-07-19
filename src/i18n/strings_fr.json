@@ -58,7 +58,15 @@
     "currentDetails": "L'homme est à la position {{position}} mètres, se déplaçant à {{velocity}} mètres par seconde avec une accélération de {{acceleration}} mètres par seconde carrée. La lecture est {{state}}.",
     "playingLabel": "en cours",
     "pausedLabel": "en pause",
-    "recordModeAccessibleName": "Mode enregistrement ou lecture"
+    "recordModeAccessibleName": "Mode enregistrement ou lecture",
+    "playPauseStart": "Lecture",
+    "playPauseEnd": "Pause",
+    "stepForward": "Avancer d'un pas",
+    "resetAll": "Tout réinitialiser",
+    "positionControl": "Position",
+    "velocityControl": "Vitesse",
+    "accelerationControl": "Accélération",
+    "wallsCheckbox": "Murs"
   },
   "preferences": {
     "title": "Simulation",

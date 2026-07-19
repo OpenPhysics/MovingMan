@@ -58,7 +58,15 @@
     "currentDetails": "The man is at position {{position}} meters, moving at {{velocity}} meters per second with an acceleration of {{acceleration}} meters per second squared. Playback is {{state}}.",
     "playingLabel": "playing",
     "pausedLabel": "paused",
-    "recordModeAccessibleName": "Record or playback mode"
+    "recordModeAccessibleName": "Record or playback mode",
+    "playPauseStart": "Play",
+    "playPauseEnd": "Pause",
+    "stepForward": "Step forward",
+    "resetAll": "Reset All",
+    "positionControl": "Position",
+    "velocityControl": "Velocity",
+    "accelerationControl": "Acceleration",
+    "wallsCheckbox": "Walls"
   },
   "preferences": {
     "title": "Simulation",

@@ -15,6 +15,7 @@ import { PlayPauseButton, ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
 import type { Tandem } from "scenerystack/tandem";
 import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/MovingManButtonOptions.js";
+import { StringManager } from "../../i18n/StringManager.js";
 import MovingManConstants from "../../MovingManConstants.js";
 import type { MovingManModel } from "../model/MovingManModel.js";
 import { FunctionComboBox } from "./FunctionComboBox.js";
@@ -85,7 +86,11 @@ export class IntroScreenView extends ScreenView {
     const comboListParent = new Node();
     const functionComboBox = new FunctionComboBox(model, comboListParent, "above");
 
-    const playPauseButton = new PlayPauseButton(model.isPlayingProperty, { radius: PLAY_PAUSE_RADIUS });
+    const playPauseButton = new PlayPauseButton(model.isPlayingProperty, {
+      radius: PLAY_PAUSE_RADIUS,
+      startPlayingAccessibleName: StringManager.getInstance().getA11yStrings().playPauseStartStringProperty,
+      endPlayingAccessibleName: StringManager.getInstance().getA11yStrings().playPauseEndStringProperty,
+    });
 
     const resetAllButton = new ResetAllButton({
       ...FLAT_RESET_ALL_BUTTON_OPTIONS,
@@ -94,6 +99,7 @@ export class IntroScreenView extends ScreenView {
         model.reset();
       },
       tandem: providedOptions.tandem.createTandem("resetAllButton"),
+      accessibleName: StringManager.getInstance().getA11yStrings().resetAllStringProperty,
     });
 
     // ── Layout ───────────────────────────────────────────────────────────────

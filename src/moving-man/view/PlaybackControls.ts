@@ -109,11 +109,16 @@ export class PlaybackControls extends HBox {
       flowBoxSpacing: 16,
       playPauseStepButtonOptions: {
         playPauseStepXSpacing: TRANSPORT_SPACING,
-        playPauseButtonOptions: { radius: PLAY_PAUSE_BUTTON_RADIUS },
+        playPauseButtonOptions: {
+          radius: PLAY_PAUSE_BUTTON_RADIUS,
+          startPlayingAccessibleName: a11y.playPauseStartStringProperty,
+          endPlayingAccessibleName: a11y.playPauseEndStringProperty,
+        },
         // The step-forward button is enabled only while paused (the group's default).
         stepForwardButtonOptions: {
           radius: TRANSPORT_BUTTON_RADIUS,
           listener: () => model.stepOnce(),
+          accessibleName: a11y.stepForwardStringProperty,
         },
       },
       tandem: Tandem.OPT_OUT,

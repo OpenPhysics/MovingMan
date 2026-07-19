@@ -164,6 +164,7 @@ export class ChartsScreenView extends ScreenView {
         resetView();
       },
       tandem: providedOptions.tandem.createTandem("resetAllButton"),
+      accessibleName: StringManager.getInstance().getA11yStrings().resetAllStringProperty,
     });
 
     // ── Layout ───────────────────────────────────────────────────────────────
