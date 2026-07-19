@@ -1,9 +1,9 @@
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import { Screen, type ScreenOptions } from "scenerystack/sim";
 import type { Tandem } from "scenerystack/tandem";
+import { createChartsIcon } from "../common/MovingManScreenIcons.js";
 import type { MovingManPreferencesModel } from "../preferences/MovingManPreferencesModel.js";
 import { MovingManModel } from "./model/MovingManModel.js";
-import { ChartsScreenIcon } from "./view/ChartsScreenIcon.js";
 import { ChartsScreenView } from "./view/ChartsScreenView.js";
 import { MovingManKeyboardHelpContent } from "./view/MovingManKeyboardHelpContent.js";
 
@@ -16,8 +16,8 @@ export class ChartsScreen extends Screen<MovingManModel, ChartsScreenView> {
       (model) => new ChartsScreenView(model, { tandem: options.tandem.createTandem("view") }),
       optionize<ChartsScreenOptions, EmptySelfOptions, ScreenOptions>()(
         {
-          homeScreenIcon: new ChartsScreenIcon({ size: Screen.MINIMUM_HOME_SCREEN_ICON_SIZE }),
-          navigationBarIcon: new ChartsScreenIcon({ size: Screen.MINIMUM_NAVBAR_ICON_SIZE }),
+          homeScreenIcon: createChartsIcon(),
+          navigationBarIcon: createChartsIcon(),
           createKeyboardHelpNode: () => new MovingManKeyboardHelpContent(),
         },
         options,

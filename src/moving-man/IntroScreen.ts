@@ -1,9 +1,9 @@
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import { Screen, type ScreenOptions } from "scenerystack/sim";
 import type { Tandem } from "scenerystack/tandem";
+import { createIntroIcon } from "../common/MovingManScreenIcons.js";
 import type { MovingManPreferencesModel } from "../preferences/MovingManPreferencesModel.js";
 import { MovingManModel } from "./model/MovingManModel.js";
-import { IntroScreenIcon } from "./view/IntroScreenIcon.js";
 import { IntroScreenView } from "./view/IntroScreenView.js";
 import { MovingManKeyboardHelpContent } from "./view/MovingManKeyboardHelpContent.js";
 
@@ -16,8 +16,8 @@ export class IntroScreen extends Screen<MovingManModel, IntroScreenView> {
       (model) => new IntroScreenView(model, { tandem: options.tandem.createTandem("view") }),
       optionize<IntroScreenOptions, EmptySelfOptions, ScreenOptions>()(
         {
-          homeScreenIcon: new IntroScreenIcon({ size: Screen.MINIMUM_HOME_SCREEN_ICON_SIZE }),
-          navigationBarIcon: new IntroScreenIcon({ size: Screen.MINIMUM_NAVBAR_ICON_SIZE }),
+          homeScreenIcon: createIntroIcon(),
+          navigationBarIcon: createIntroIcon(),
           createKeyboardHelpNode: () => new MovingManKeyboardHelpContent(),
         },
         options,

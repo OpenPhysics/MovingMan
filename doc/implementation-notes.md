@@ -31,7 +31,8 @@ src/
       PlaybackControls.ts                               Charts transport only
       MovingManSounds.ts                                wall collision thud + grunt
       MovingManScreenSummaryContent.ts, MovingManKeyboardHelpContent.ts
-      IntroScreenIcon.ts, ChartsScreenIcon.ts
+  common/
+    MovingManScreenIcons.ts                              home / nav screen icons
 ```
 
 Data flows Model → View through AXON `Property` objects and `DataSeries` emitters.
