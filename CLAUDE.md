@@ -4,18 +4,20 @@ Sim-specific context for AI assistants. General SceneryStack guidance: [OpenPhys
 
 ## Project
 
-SceneryStack port of the PhET Java Moving Man simulation. Two screens: Introduction (play area + sliders) and Charts (record/playback time-series graphs). The man moves in **1D**; you drive one kinematic quantity and the other two are derived.
+SceneryStack port of the PhET Java *Moving Man* simulation. Two screens: **Introduction** (play area + sliders, live rolling graphs) and **Charts** (record/playback time-series graphs). The man moves in **1D**; you drive one kinematic quantity and the other two are derived.
+
+Physics for educators: `doc/model.md`. Architecture: `doc/implementation-notes.md`.
 
 ## Key files
 
 | Area | Location |
 |---|---|
-| Screens | `IntroScreen.ts`, `ChartsScreen.ts` |
-| Model | `MovingManModel.ts` (screen state + step), `MovingMan.ts` (the man: kinematics + motion strategies), `DataSeries.ts` (time-series buffers), `MotionStrategy.ts`, `functionPresets.ts` (x(t) presets) |
-| Numerics | `motionMath.ts` (centered derivatives), `binarySearch.ts`, `MovingManConstants.ts` |
-| View | `IntroScreenView.ts`, `ChartsScreenView.ts`, `ChartNode.ts`, `MovingManSpriteNode.ts`, `PlayAreaNode.ts` |
-| Sounds | `MovingManSounds.ts` — wall collision thud + grunt |
-| Colors | `MovingManColors.ts`, `MovingManNamespace.ts` |
+| Screens | `src/moving-man/IntroScreen.ts`, `ChartsScreen.ts` |
+| Model | `model/MovingManModel.ts` (screen state + step), `MovingMan.ts` (kinematics + motion strategies), `DataSeries.ts` (time-series buffers), `MotionStrategy.ts`, `functionPresets.ts` (x(t) presets), `MovingManConstants.ts` |
+| Numerics | `model/motionMath.ts` (centered derivatives), `model/binarySearch.ts` |
+| View | `view/IntroScreenView.ts`, `ChartsScreenView.ts`, `ChartNode.ts`, `MovingManSpriteNode.ts`, `PlayAreaNode.ts`, `MovingManScreenSummaryContent.ts` |
+| Sounds | `view/MovingManSounds.ts` — wall collision thud + grunt |
+| Colors / strings | `MovingManColors.ts`, `MovingManNamespace.ts`, `src/i18n/StringManager.ts` |
 
 ## Model
 
@@ -35,17 +37,10 @@ SceneryStack port of the PhET Java Moving Man simulation. Two screens: Introduct
 
 ### Stepping, derivation & walls
 
-- **Fixed timestep accumulator.** `step(dt)` runs whole `FIXED_DT` slices (capped by `MAX_CATCHUP_STEPS`), gated on play state; recording vs. playback branches per slice.
+- **Fixed timestep accumulator.** `step(dt)` runs whole `FIXED_DT` slices (capped by `MAX_CATCHUP_STEPS`), gated on play state; recording vs. playback branches per slice. Introduction uses `noRecording: true` for live-only motion.
 - **Strategy determines derivation direction:** position-driven → velocity & acceleration by **differentiation** (`estimatedCenteredDerivatives` over the data series, with mid-point smoothing); velocity-driven → position by **integration**, acceleration by differentiation; acceleration-driven → velocity & position by integration (trapezoidal mid-velocity). `snapToZero` cleans tiny residuals so a parked man reads exactly 0.
 - **Walls:** `clampIfWalled` clamps the new position to the wall; on a collision the driving velocity is zeroed and `collideEmitter` fires → `MovingManSounds` thud.
 - `DataSeries` keeps parallel *model* and *graph* series per quantity (plus a `mouseDataSeries` for pointer drags) feeding the Charts screen.
-
-## Conventions & notable port choices
-
-- Free-form x(t) formula entry replaced by an **x(t) preset menu** (`FunctionComboBox`) — SceneryStack has no built-in text input.
-- Man rendered as a sprite with walking animation and wall-collision lean.
-- Easter-egg cloud animation from the original is not included.
-- Enums use a `const` object + string-literal union (not a TS `enum`) to stay compatible with `erasableSyntaxOnly`.
 
 ## Accessibility
 
@@ -65,19 +60,27 @@ Fleet-standard Vitest layout:
 
 | Path | Purpose |
 |---|---|
-| `vitest.config.ts` | Test environment + `setupFiles` when present; `execArgv: ["--expose-gc"]` with memory-leak suite |
-| `tests/setup.ts` | Canvas / AudioContext mocks + `init({ name: "…" })` before SceneryStack imports (when required) |
+| `vitest.config.ts` | `happy-dom` environment, `setupFiles`, `execArgv: ["--expose-gc"]` |
+| `tests/setup.ts` | Canvas / AudioContext mocks + `init({ name: "…" })` before SceneryStack imports |
 | `tests/**/*.test.ts` | Model/physics unit tests — mirror `src/` under `tests/` |
 | `tests/memory-leak.test.ts` | WeakRef + `forceGC` dispose regression (fleet pattern) |
 
-- Put unit tests only under root `tests/` (never co-locate or use `__tests__/`).
-- Run `npm test`. CI runs the suite when a `test` script is present.
-- Expand `memory-leak.test.ts` for components that add/remove nodes or link Properties at runtime (see OpticsLab).
+Actual specs:
+
+- `tests/moving-man/model/MovingManModel.test.ts`
+- `tests/memory-leak.test.ts`
+
+Run `npm test`. CI runs the suite when a `test` script is present.
 
 ## Commands
 
 ```bash
 npm run lint && npm run check && npm run build
+npm test
 ```
 
-No unit-test suite — the build/lint/check gate plus manual run substitute for tests here.
+## Development notes
+
+- Free-form x(t) formula entry replaced by an **x(t) preset menu** (`FunctionComboBox`) — SceneryStack has no built-in text input.
+- Man rendered as a sprite with walking animation and wall-collision lean. Easter-egg cloud animation from the original is not included.
+- Enums use a `const` object + string-literal union (not a TS `enum`) to stay compatible with `erasableSyntaxOnly`.

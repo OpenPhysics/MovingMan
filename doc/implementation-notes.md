@@ -1,75 +1,91 @@
-# Implementation Notes - Moving Man Simulation
+# Implementation Notes - Moving Man
+
+Developer-facing notes on the architecture. The physics itself is documented for educators in
+[model.md](./model.md).
 
 ## Architecture Overview
 
-The Moving Man simulation is structured using a Model-View pattern across two screens that share the same model class but differ in recording and chart behavior. It is a SceneryStack port of the PhET *Moving Man* simulation.
+Moving Man is a two-screen SceneryStack simulation, a TypeScript port of PhET's *Moving Man*
+Java/HTML5 sim. Each screen constructs its own `MovingManModel` instance with different options.
 
-### High-Level Architecture
+```
+src/
+  main.ts, brand.ts, splash.ts, assert.ts, init.ts     bootstrap chain
+  MovingManColors.ts, MovingManNamespace.ts
+  i18n/StringManager.ts, strings_*.json
+  preferences/                                          query params + Preferences
+  moving-man/
+    IntroScreen.ts                                      model(noRecording: true) + IntroScreenView
+    ChartsScreen.ts                                     full model + ChartsScreenView
+    model/
+      MovingManModel.ts                                 TModel + ManContext; record/playback
+      MovingMan.ts                                      1-D kinematics + motion strategies
+      DataSeries.ts                                     rolling / time-limited chart buffers
+      MotionStrategy.ts, functionPresets.ts             driving quantity + x(t) presets
+      MovingManConstants.ts, motionMath.ts, binarySearch.ts
+    view/
+      IntroScreenView.ts, ChartsScreenView.ts           screen coordinators
+      PlayAreaNode.ts, MovingManSpriteNode.ts           track, walls, walking sprite
+      ChartNode.ts, LinearTransform.ts                  bamboo charts + axis mapping
+      VariableControl.ts, FunctionComboBox.ts, WallsCheckbox.ts
+      PlaybackControls.ts                               Charts transport only
+      MovingManSounds.ts                                wall collision thud + grunt
+      MovingManScreenSummaryContent.ts, MovingManKeyboardHelpContent.ts
+      IntroScreenIcon.ts, ChartsScreenIcon.ts
+```
 
-The simulation follows a modular architecture with **two screens**:
+Data flows Model → View through AXON `Property` objects and `DataSeries` emitters.
 
-- **Intro screen** (`IntroScreen`): Play area and quantity controls only (no charts); `MovingManModel` created with `noRecording: true`
-- **Charts screen** (`ChartsScreen`): Full record/playback with history scrubbing
+## Key design decisions
 
-Each screen has its own model instance and view:
+- **Two models, one class.** `IntroScreen` passes `{ noRecording: true }`, which sets
+  `recordingProperty` false, uses `LimitedSizeDataSeries` for charts (short rolling windows),
+  and skips history scrubbing. `ChartsScreen` uses time-limited series (`SERIES_TIME_LIMIT` =
+  20 s) and full record/playback with `playbackSpeedProperty`.
+- **Fixed timestep accumulator.** `FIXED_DT = 1/24 s`, `MAX_CATCHUP_STEPS = 10`. Playback
+  multiplies wall-clock dt by `playbackSpeedProperty` but each integration slice still uses
+  `FIXED_DT` so derivatives stay stable.
+- **Strategy determines derivation direction.** See `MovingMan.updateFromStrategy`:
+  position-driven → `estimateCenteredDerivatives` on model series; velocity-driven → integrate x,
+  differentiate a; acceleration-driven → integrate v and x. `snapToZero` clears residuals below
+  `1e-6` so a parked man reads exactly 0.
+- **Walls.** `clampIfWalled` clamps x to ±`HALF_CONTAINER_WIDTH`; on collision velocity → 0 and
+  `collideEmitter` fires → `MovingManSounds.addCollisionSounds`.
+- **x(t) presets replace formula entry.** `functionProperty` non-null overrides the motion
+  strategy; selecting a preset resets time/history and auto-plays. Drag/slider interaction clears
+  the preset.
+- **Derivative tuning.** `DERIVATIVE_RADIUS = 3` (widened from PhET's 1) trades ~250 ms
+  acceleration lag for smoother hand-drag readouts — documented in `MovingManConstants.ts`.
+- **Nested constants.** `src/moving-man/model/MovingManConstants.ts` (fleet carve-out).
 
-- **Model Layer (`src/moving-man/model/`)**: 1D kinematics, motion strategy, data series, and playback state
-- **View Layer (`src/moving-man/view/`)**: Play area, charts, controls, and sound
+## View components
 
-`MovingManModel` implements `TModel` and a `ManContext` interface used by the moving man entity.
+- **IntroScreenView** — full-width play area, three `VariableControl` sliders, walls checkbox,
+  vector toggles, `FunctionComboBox`. No playback bar.
+- **ChartsScreenView** — compact play area + three collapsible `ChartNode`s (x, v, a vs t),
+  `PlaybackControls`, shared vector toggles and preset picker.
+- **PlayAreaNode** — ruler, wall graphics, bounds.
+- **MovingManSpriteNode** — sprite sheet walking animation; lean on wall collision.
+- **ChartNode** — bamboo chart with zoom; reads `MovingMan.*GraphSeries`.
+- **MovingManSounds** — registers collision clips with sound manager.
 
-### Model-View Transform
+## Disposal conventions
 
-The play area is one-dimensional horizontally. Wall positions are defined by `HALF_CONTAINER_WIDTH` in model space. `LinearTransform.ts` maps model values to chart axis coordinates on the Charts screen.
+Screen-lifetime views and the man's data series persist for the session. No dynamic particle
+add/remove. Fleet memory-leak suite uses a minimal dispose pattern (see `tests/memory-leak.test.ts`).
 
-## Model Components
+## Testing
 
-### Core Model Design
+`npm test` (vitest):
 
-`MovingManModel` coordinates walls, recording, playback speed, simulation time, and history.
+- `tests/moving-man/model/MovingManModel.test.ts` — acceleration-mode integration, reset, wall
+  collision when enabled
+- `tests/memory-leak.test.ts` — WeakRef/GC regression suite
 
-### Component Specialization
+CI also runs `npm run lint && npm run check && npm run build`.
 
-Each model component has a single responsibility:
+## Multi-screen simulations
 
-1. **MovingMan**: 1D position, velocity, and acceleration; function presets and wall collisions
-2. **DataSeries**: Time series for x, v, and a used by charts
-3. **MotionStrategy**: Which quantity (position, velocity, or acceleration) drives motion
-4. **functionPresets.ts**: x(t) preset formulas replacing free-form text entry
-
-### Physics Simulation Approach
-
-Integration advances the man's state according to the active motion strategy. Wall collisions stop the man at the boundary (velocity zeroed) when walls are enabled.
-
-On the Charts screen, state history supports record, pause, and playback scrubbing. The Intro screen disables recording (no stored history).
-
-Constants live in `MovingManConstants.ts`.
-
-## View Components
-
-### Screen Views as Coordinators
-
-**IntroScreenView** combines the play area with three variable sliders and a walls checkbox.
-
-**ChartsScreenView** uses a compact play area with three collapsible x/v/a vs time charts and transport controls.
-
-Specialized view classes handle specific aspects:
-
-1. **PlayAreaNode**: Ruler, walls, and play-area bounds
-2. **MovingManSpriteNode**: Walking animation with wall-collision lean
-3. **ChartNode**: Bamboo-based charts with axis zoom
-4. **VariableControl**: Slider and vector checkbox per kinematic quantity
-5. **FunctionComboBox**: x(t) preset picker
-6. **PlaybackControls**: Record/playback transport on the Charts screen
-7. **MovingManSounds**: Wall collision thud and grunt via `addCollisionSounds()`
-
-### Color Scheme
-
-Colors are defined in `MovingManColors.ts`. Chart series colors should come from named color properties, not inline hex values.
-
-### Performance Optimizations
-
-- Chart series on the Charts screen use time-limited rolling windows
-- History storage on the Charts screen is bounded by reset
-
-Note that no dispose functions have been used, which should be addressed.
+Intro and Charts share `MovingManScreenSummaryContent` and keyboard-help patterns. For fleet
+multi-screen conventions (StringManager getters, per-screen folders), see `doc/multi-screen.md` if
+adding a third screen.
