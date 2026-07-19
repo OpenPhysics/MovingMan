@@ -14,7 +14,8 @@ import { AlignGroup, Node, VBox } from "scenerystack/scenery";
 import { PlayPauseButton, ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
 import type { Tandem } from "scenerystack/tandem";
-import MovingManConstants from "../model/MovingManConstants.js";
+import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/MovingManButtonOptions.js";
+import MovingManConstants from "../../MovingManConstants.js";
 import type { MovingManModel } from "../model/MovingManModel.js";
 import { FunctionComboBox } from "./FunctionComboBox.js";
 import { MovingManScreenSummaryContent } from "./MovingManScreenSummaryContent.js";
@@ -87,6 +88,7 @@ export class IntroScreenView extends ScreenView {
     const playPauseButton = new PlayPauseButton(model.isPlayingProperty, { radius: PLAY_PAUSE_RADIUS });
 
     const resetAllButton = new ResetAllButton({
+      ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {
         this.interruptSubtreeInput();
         model.reset();

@@ -57,7 +57,7 @@ Data flows Model → View through AXON `Property` objects and `DataSeries` emitt
   the preset.
 - **Derivative tuning.** `DERIVATIVE_RADIUS = 3` (widened from PhET's 1) trades ~250 ms
   acceleration lag for smoother hand-drag readouts — documented in `MovingManConstants.ts`.
-- **Nested constants.** `src/moving-man/model/MovingManConstants.ts` (fleet carve-out).
+- **Nested constants.** `src/MovingManConstants.ts` (fleet carve-out).
 
 ## View components
 

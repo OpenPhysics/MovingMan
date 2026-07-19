@@ -15,9 +15,9 @@ import { ArrowNode } from "scenerystack/scenery-phet";
 import { Animation, Easing } from "scenerystack/twixt";
 import { StringManager } from "../../i18n/StringManager.js";
 import MovingManColors from "../../MovingManColors.js";
+import MovingManConstants from "../../MovingManConstants.js";
 import walkingImageUrl from "../images/man-left.gif";
 import standingImageUrl from "../images/man-standing.gif";
-import MovingManConstants from "../model/MovingManConstants.js";
 import type { MovingManModel } from "../model/MovingManModel.js";
 import type { LinearTransform } from "./LinearTransform.js";
 

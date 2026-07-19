@@ -13,10 +13,10 @@
 
 import { Emitter, NumberProperty, Property } from "scenerystack/axon";
 import { metersPerSecondSquaredUnit, metersPerSecondUnit, metersUnit } from "scenerystack/scenery-phet";
+import MovingManConstants from "../../MovingManConstants.js";
 import { type DataPoint, type DataSeries, LimitedSizeDataSeries, LimitedTimeDataSeries } from "./DataSeries.js";
 import type { MovingManFunctionPreset } from "./functionPresets.js";
 import { MotionStrategy } from "./MotionStrategy.js";
-import MovingManConstants from "./MovingManConstants.js";
 import { estimateDerivative } from "./motionMath.js";
 
 const {

@@ -13,12 +13,12 @@
 import { BooleanProperty, NumberProperty } from "scenerystack/axon";
 import type { TModel } from "scenerystack/joist";
 import { secondsUnit } from "scenerystack/scenery-phet";
+import MovingManConstants from "../../MovingManConstants.js";
 import type { MovingManPreferencesModel } from "../../preferences/MovingManPreferencesModel.js";
 import movingManQueryParameters from "../../preferences/movingManQueryParameters.js";
 import { closestIndex } from "./binarySearch.js";
 import type { ManState } from "./MovingMan.js";
 import { type ManContext, MovingMan } from "./MovingMan.js";
-import MovingManConstants from "./MovingManConstants.js";
 
 const { FIXED_DT, MAX_CATCHUP_STEPS, HALF_CONTAINER_WIDTH, MAX_TIME } = MovingManConstants;
 

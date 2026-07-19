@@ -19,9 +19,9 @@ import { HBox, Image, LinearGradient, Node, Rectangle, type TColor, Text } from 
 import { NumberDisplay, PhetFont, RulerNode } from "scenerystack/scenery-phet";
 import { StringManager } from "../../i18n/StringManager.js";
 import MovingManColors from "../../MovingManColors.js";
+import MovingManConstants from "../../MovingManConstants.js";
 import cottageImage from "../images/cottage.gif";
 import treeImage from "../images/tree.png";
-import MovingManConstants from "../model/MovingManConstants.js";
 import type { MovingManModel } from "../model/MovingManModel.js";
 import { LinearTransform } from "./LinearTransform.js";
 import { MovingManSpriteNode } from "./MovingManSpriteNode.js";

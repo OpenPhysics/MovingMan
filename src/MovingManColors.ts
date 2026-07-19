@@ -57,6 +57,24 @@ const MovingManColors = {
   chartGridProperty: profileColor("chartGrid", new Color(220, 220, 220), new Color(220, 220, 220)),
   chartBorderProperty: profileColor("chartBorder", new Color(120, 120, 120), new Color(120, 120, 120)),
   chartCursorProperty: profileColor("chartCursor", "rgba(0,0,0,0.45)", "rgba(0,0,0,0.45)"),
+
+  // Fleet-standard aliases for shared Panel + ButtonOptions modules.
+  panelBackgroundColorProperty: profileColor("panelBackground", PANEL_FILL_DEFAULT, PANEL_FILL_PROJECTOR),
+  panelBorderColorProperty: profileColor("panelBorder", PANEL_STROKE, PANEL_STROKE),
+  textColorProperty: profileColor("text", BLACK, BLACK),
+
+  // ── Light control surfaces ───────────────────────────────────────────────────
+  // White chrome (combo boxes, flat push buttons, editable input fields) stays light
+  // in both profiles; its text stays dark.
+
+  /** Fill of light control surfaces: combo-box button/list, editable input fields. */
+  controlSurfaceColorProperty: profileColor("controlSurface", "#ffffff", "#ffffff"),
+
+  /** Fill of a disabled control surface (grayed-out editable input field). */
+  controlSurfaceDisabledColorProperty: profileColor("controlSurfaceDisabled", "#cccccc", "#cccccc"),
+
+  /** Text on light control surfaces: combo items, flat-button labels, field values, preferences. */
+  controlSurfaceTextColorProperty: profileColor("controlSurfaceText", "#1a1a1a", "#1a1a1a"),
 };
 
 export default MovingManColors;

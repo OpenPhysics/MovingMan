@@ -9,7 +9,7 @@
  * brick walls and keeping the man fully on-screen when he reaches an end.
  */
 
-import MovingManConstants from "../model/MovingManConstants.js";
+import MovingManConstants from "../../MovingManConstants.js";
 
 export class LinearTransform {
   public readonly pixelsPerMeter: number;

@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import MovingManConstants from "../src/moving-man/model/MovingManConstants.js";
+import MovingManConstants from "../src/MovingManConstants.js";
 import { MovingManModel } from "../src/moving-man/model/MovingManModel.js";
 
 const { FIXED_DT } = MovingManConstants;

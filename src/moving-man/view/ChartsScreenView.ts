@@ -17,10 +17,11 @@ import { PhetFont, PlusMinusZoomButtonGroup, ResetAllButton } from "scenerystack
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
 import { AccordionBox } from "scenerystack/sun";
 import type { Tandem } from "scenerystack/tandem";
+import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/MovingManButtonOptions.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import MovingManColors from "../../MovingManColors.js";
+import MovingManConstants from "../../MovingManConstants.js";
 import type { DataSeries } from "../model/DataSeries.js";
-import MovingManConstants from "../model/MovingManConstants.js";
 import type { MovingManModel } from "../model/MovingManModel.js";
 import { ChartNode, type ZoomLevel } from "./ChartNode.js";
 import { FunctionComboBox } from "./FunctionComboBox.js";
@@ -156,6 +157,7 @@ export class ChartsScreenView extends ScreenView {
     };
 
     const resetAllButton = new ResetAllButton({
+      ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {
         this.interruptSubtreeInput();
         model.reset();

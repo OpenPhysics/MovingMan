@@ -52,7 +52,7 @@ each locale JSON, via `StringManager.getA11yStrings()`.
 
 ## Compliance carve-outs
 
-- **Nested constants:** `src/moving-man/model/MovingManConstants.ts` — PhET-port kinematics/layout constants next to the model.
+- **Nested constants:** `src/MovingManConstants.ts` — PhET-port kinematics/layout constants next to the model.
 
 ## Testing
 
