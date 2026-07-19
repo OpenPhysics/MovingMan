@@ -2,7 +2,7 @@
  * main.ts
  *
  * Entry point for the simulation. Initializes SceneryStack, creates the
- * screen, and starts the main event loop.
+ * screens, and starts the main event loop.
  *
  * !! CRITICAL IMPORT ORDER !!
  * brand.js MUST be the first import. Each module imports the next, so the import nesting is
