@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import MovingManConstants from "../src/MovingManConstants.js";
 import { MovingManModel } from "../src/moving-man/model/MovingManModel.js";
 
-const { FIXED_DT } = MovingManConstants;
+const FIXED_DT: number = MovingManConstants.FIXED_DT;
 
 async function forceGC(earlyExitRef?: WeakRef<object>): Promise<void> {
   for (let i = 0; i < 15; i++) {
