@@ -10,6 +10,7 @@ import { PhetFont } from "scenerystack/scenery-phet";
 import { Checkbox } from "scenerystack/sun";
 import type { Tandem } from "scenerystack/tandem";
 import { StringManager } from "../i18n/StringManager.js";
+import MovingManColors from "../MovingManColors.js";
 import MovingManNamespace from "../MovingManNamespace.js";
 import type { MovingManPreferencesModel } from "./MovingManPreferencesModel.js";
 
@@ -17,8 +18,10 @@ export class MovingManPreferencesNode extends VBox {
   public constructor(preferencesModel: MovingManPreferencesModel, tandem?: Tandem) {
     const prefStrings = StringManager.getInstance().getPreferences();
 
+    // Preferences dialog is always white — use control-surface colors, not textColorProperty.
     const header = new Text(prefStrings.titleStringProperty, {
       font: new PhetFont({ size: 18, weight: "bold" }),
+      fill: MovingManColors.controlSurfaceTextColorProperty,
     });
 
     const checkbox = (
@@ -26,10 +29,19 @@ export class MovingManPreferencesNode extends VBox {
       labelProperty: typeof prefStrings.wallsEnabledStringProperty,
       tandemName: string,
     ): Checkbox =>
-      new Checkbox(property, new Text(labelProperty, { font: new PhetFont(14) }), {
-        spacing: 8,
-        ...(tandem && { tandem: tandem.createTandem(tandemName) }),
-      });
+      new Checkbox(
+        property,
+        new Text(labelProperty, {
+          font: new PhetFont(14),
+          fill: MovingManColors.controlSurfaceTextColorProperty,
+        }),
+        {
+          spacing: 8,
+          checkboxColor: MovingManColors.controlSurfaceTextColorProperty,
+          checkboxColorBackground: MovingManColors.controlSurfaceColorProperty,
+          ...(tandem && { tandem: tandem.createTandem(tandemName) }),
+        },
+      );
 
     super({
       align: "left",

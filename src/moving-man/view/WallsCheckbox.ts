@@ -22,6 +22,8 @@ export class WallsCheckbox extends Panel {
     const a11y = StringManager.getInstance().getA11yStrings();
     const checkbox = new Checkbox(model.wallsEnabledProperty, label, {
       boxWidth: 16,
+      checkboxColor: MovingManColors.foregroundColorProperty,
+      checkboxColorBackground: MovingManColors.panelFillProperty,
       accessibleName: a11y.wallsCheckboxStringProperty,
     });
     super(checkbox, {

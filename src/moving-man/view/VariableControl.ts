@@ -253,7 +253,11 @@ export class VariableControl extends Panel {
     labelStringProperty: TReadOnlyProperty<string>,
   ): Node {
     const label = new Text(labelStringProperty, { font: LABEL_FONT, fill: MovingManColors.foregroundColorProperty });
-    return new Checkbox(visibleProperty, label, { boxWidth: 14 });
+    return new Checkbox(visibleProperty, label, {
+      boxWidth: 14,
+      checkboxColor: MovingManColors.foregroundColorProperty,
+      checkboxColorBackground: MovingManColors.panelFillProperty,
+    });
   }
 
   // Height of a vector-checkbox row, measured once from a throwaway checkbox and reused to
