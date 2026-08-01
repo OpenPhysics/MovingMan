@@ -24,7 +24,7 @@ import {
 import { Range, Vector2 } from "scenerystack/dot";
 import { Shape } from "scenerystack/kite";
 import { Orientation } from "scenerystack/phet-core";
-import { DragListener, KeyboardListener, Line, Node, type TColor, Text } from "scenerystack/scenery";
+import { KeyboardListener, Line, Node, RichDragListener, type TColor, Text } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { StringManager } from "../../i18n/StringManager.js";
 import MovingManColors from "../../MovingManColors.js";
@@ -45,9 +45,8 @@ const CURSOR_LINE_WIDTH = 1.5;
 
 const GRID_LINE_WIDTH = 0.5;
 
-// Keyboard scrubbing: model-time step (seconds) per arrow-key press; shift is the coarse step.
-const SCRUB_KEY_STEP = 0.25;
-const SCRUB_KEY_STEP_LARGE = 1;
+// Model-time scrub speed (seconds per view-pixel of keyboard drag).
+const SCRUB_PER_PX = 0.02;
 
 /** One zoom level: axis extent `max` and tick/grid `step`, both in model units. */
 export type ZoomLevel = { readonly max: number; readonly step: number };
@@ -205,6 +204,7 @@ export class ChartNode extends Node {
 
     // ── Scrubbing inside the chart ────────────────────────────────────────────
     // Click or drag inside the chart background to seek (only while in playback).
+    // Home/End remain on KeyboardListener; Left/Right scrub via RichDragListener.
     const scrub = (globalX: number): void => {
       if (model.recordingProperty.value || model.noRecording) {
         return;
@@ -213,16 +213,6 @@ export class ChartNode extends Node {
       const t = Math.max(0, Math.min(model.furthestRecordedTimeProperty.value, chartTransform.viewToModelX(localX)));
       model.setPlaybackTime(t);
     };
-    const dragListener = new DragListener({
-      press: (event) => scrub(event.pointer.point.x),
-      drag: (event) => scrub(event.pointer.point.x),
-    });
-    chartRectangle.addInputListener(dragListener);
-    chartRectangle.cursor = "ew-resize";
-
-    // Keyboard-accessible scrubbing: focus the chart and use Left/Right (Shift = coarse step,
-    // Home/End jump to the ends of the recording). Only focusable while in playback, mirroring
-    // the pointer scrub's guard so the control is inert during recording.
     const a11yStrings = StringManager.getInstance().getA11yStrings();
     chartRectangle.tagName = "div";
     chartRectangle.accessibleName = a11yStrings.timeCursorAccessibleNameStringProperty;
@@ -230,25 +220,37 @@ export class ChartNode extends Node {
       chartRectangle.focusable = !(recording || model.noRecording);
     });
     chartRectangle.addInputListener(
+      new RichDragListener({
+        dragListenerOptions: {
+          press: (event) => scrub(event.pointer.point.x),
+          drag: (event) => scrub(event.pointer.point.x),
+        },
+        keyboardDragListenerOptions: {
+          keyboardDragDirection: "leftRight",
+          dragSpeed: 80,
+          shiftDragSpeed: 200,
+          drag: (_event, listener) => {
+            if (model.recordingProperty.value || model.noRecording) {
+              return;
+            }
+            const max = model.furthestRecordedTimeProperty.value;
+            const t = timeProperty.value + listener.modelDelta.x * SCRUB_PER_PX;
+            model.setPlaybackTime(Math.max(0, Math.min(max, t)));
+          },
+        },
+      }),
+    );
+    chartRectangle.cursor = "ew-resize";
+
+    chartRectangle.addInputListener(
       new KeyboardListener({
-        keys: ["arrowLeft", "arrowRight", "shift+arrowLeft", "shift+arrowRight", "home", "end"],
+        keys: ["home", "end"],
         fire: (_event, keysPressed) => {
           if (model.recordingProperty.value || model.noRecording) {
             return;
           }
           const max = model.furthestRecordedTimeProperty.value;
-          const step = keysPressed.includes("shift") ? SCRUB_KEY_STEP_LARGE : SCRUB_KEY_STEP;
-          let t = timeProperty.value;
-          if (keysPressed.includes("home")) {
-            t = 0;
-          } else if (keysPressed.includes("end")) {
-            t = max;
-          } else if (keysPressed.includes("arrowLeft")) {
-            t -= step;
-          } else if (keysPressed.includes("arrowRight")) {
-            t += step;
-          }
-          model.setPlaybackTime(Math.max(0, Math.min(max, t)));
+          model.setPlaybackTime(keysPressed === "home" ? 0 : max);
         },
       }),
     );

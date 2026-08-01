@@ -10,7 +10,7 @@
 
 import { Matrix3 } from "scenerystack/dot";
 import { Shape } from "scenerystack/kite";
-import { DragListener, Image, KeyboardDragListener, Node, Path } from "scenerystack/scenery";
+import { Image, Node, Path, RichDragListener } from "scenerystack/scenery";
 import { ArrowNode } from "scenerystack/scenery-phet";
 import { Animation, Easing } from "scenerystack/twixt";
 import { StringManager } from "../../i18n/StringManager.js";
@@ -233,32 +233,27 @@ export class MovingManSpriteNode extends Node {
       }
     };
 
-    // Dragging the man drives him from position (and, on the Charts screen, records).
     this.addInputListener(
-      new DragListener({
-        start: startPositionDrive,
-        drag: (event) => {
-          const localX = this.globalToParentPoint(event.pointer.point).x;
-          man.setMousePosition(transform.viewToModelX(localX));
-          man.setPositionDriven();
+      new RichDragListener({
+        dragListenerOptions: {
+          start: startPositionDrive,
+          drag: (event) => {
+            const localX = this.globalToParentPoint(event.pointer.point).x;
+            man.setMousePosition(transform.viewToModelX(localX));
+            man.setPositionDriven();
+          },
         },
-      }),
-    );
-
-    // Keyboard equivalent: Left/Right arrows (Shift for a finer step) move the man along the
-    // track. With no view transform on the listener, modelDelta is the view-pixel delta, so
-    // convert it to model meters via the play area's pixels-per-meter scale.
-    this.addInputListener(
-      new KeyboardDragListener({
-        keyboardDragDirection: "leftRight",
-        dragDelta: 6,
-        shiftDragDelta: 2,
-        dragSpeed: 300,
-        shiftDragSpeed: 120,
-        start: startPositionDrive,
-        drag: (_event, listener) => {
-          man.setPositionDriven();
-          man.setMousePosition(man.getMousePosition() + listener.modelDelta.x / transform.pixelsPerMeter);
+        keyboardDragListenerOptions: {
+          keyboardDragDirection: "leftRight",
+          dragDelta: 6,
+          shiftDragDelta: 2,
+          dragSpeed: 300,
+          shiftDragSpeed: 120,
+          start: startPositionDrive,
+          drag: (_event, listener) => {
+            man.setPositionDriven();
+            man.setMousePosition(man.getMousePosition() + listener.modelDelta.x / transform.pixelsPerMeter);
+          },
         },
       }),
     );
