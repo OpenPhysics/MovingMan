@@ -25,21 +25,26 @@
  *   const panel = new MovingManPanel(content, { fill: "transparent" });
  */
 
+import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import type { Node } from "scenerystack/scenery";
-import type { PanelOptions } from "scenerystack/sun";
-import { Panel } from "scenerystack/sun";
+import { Panel, type PanelOptions } from "scenerystack/sun";
 import MovingManColors from "../MovingManColors.js";
 import { PANEL_CORNER_RADIUS } from "../MovingManConstants.js";
 
+export type MovingManPanelOptions = PanelOptions;
+
 export class MovingManPanel extends Panel {
-  public constructor(content: Node, providedOptions?: PanelOptions) {
-    super(content, {
-      fill: MovingManColors.panelBackgroundColorProperty,
-      stroke: MovingManColors.panelBorderColorProperty,
-      cornerRadius: PANEL_CORNER_RADIUS,
-      xMargin: 12,
-      yMargin: 10,
-      ...providedOptions,
-    });
+  public constructor(content: Node, providedOptions?: MovingManPanelOptions) {
+    const options = optionize<MovingManPanelOptions, EmptySelfOptions, PanelOptions>()(
+      {
+        fill: MovingManColors.panelBackgroundColorProperty,
+        stroke: MovingManColors.panelBorderColorProperty,
+        cornerRadius: PANEL_CORNER_RADIUS,
+        xMargin: 12,
+        yMargin: 10,
+      },
+      providedOptions,
+    );
+    super(content, options);
   }
 }

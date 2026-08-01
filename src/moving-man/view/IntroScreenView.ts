@@ -10,6 +10,7 @@
  * original sim's simplification of the Intro tab.
  */
 
+import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import { AlignGroup, Node, VBox } from "scenerystack/scenery";
 import { PlayPauseButton, ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
@@ -38,7 +39,13 @@ export type IntroScreenViewOptions = ScreenViewOptions & { tandem: Tandem };
 
 export class IntroScreenView extends ScreenView {
   public constructor(model: MovingManModel, providedOptions: IntroScreenViewOptions) {
-    super({ ...providedOptions, screenSummaryContent: new MovingManScreenSummaryContent(model) });
+    const options = optionize<IntroScreenViewOptions, EmptySelfOptions, ScreenViewOptions>()(
+      {
+        screenSummaryContent: new MovingManScreenSummaryContent(model),
+      },
+      providedOptions,
+    );
+    super(options);
 
     // Permanent for the sim's lifetime; declare that so the collision-sound emitter listener
     // and the child controls' model links are not read as unmanaged leaks.

@@ -12,6 +12,7 @@
 
 import { NumberProperty, type Property, type TReadOnlyProperty } from "scenerystack/axon";
 import { Range } from "scenerystack/dot";
+import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
 import { HBox, Node, type TColor, Text, VBox } from "scenerystack/scenery";
 import { PhetFont, PlusMinusZoomButtonGroup, ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
@@ -71,7 +72,13 @@ export class ChartsScreenView extends ScreenView {
   private readonly chartNodes: ChartNode[] = [];
 
   public constructor(model: MovingManModel, providedOptions: ChartsScreenViewOptions) {
-    super({ ...providedOptions, screenSummaryContent: new MovingManScreenSummaryContent(model) });
+    const options = optionize<ChartsScreenViewOptions, EmptySelfOptions, ScreenViewOptions>()(
+      {
+        screenSummaryContent: new MovingManScreenSummaryContent(model),
+      },
+      providedOptions,
+    );
+    super(options);
 
     // This screen view is permanent for the sim's lifetime; declare that so the collision-sound
     // emitter listener and per-chart links registered here are not read as unmanaged leaks.
