@@ -1,5 +1,7 @@
 # Moving Man
 
+[![CI](https://github.com/OpenPhysics/MovingMan/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenPhysics/MovingMan/actions/workflows/ci.yml)
+
 A [SceneryStack](https://scenerystack.org/) port of the PhET **Moving Man** simulation. Explore 1D
 kinematics by dragging the man or using position, velocity, and acceleration controls.
 
