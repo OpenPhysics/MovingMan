@@ -228,7 +228,7 @@ export class ChartNode extends Node {
         keyboardDragListenerOptions: {
           keyboardDragDirection: "leftRight",
           dragSpeed: 80,
-          shiftDragSpeed: 200,
+          shiftDragSpeed: 20,
           drag: (_event, listener) => {
             if (model.recordingProperty.value || model.noRecording) {
               return;
