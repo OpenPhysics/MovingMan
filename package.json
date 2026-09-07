@@ -49,7 +49,7 @@
     "@types/node": "^24.13.3",
     "happy-dom": "^20.14.0",
     "jsdom": "^30.0.1",
-    "playwright": "^1.62.1",
+    "playwright": "^1.63.0",
     "png-to-ico": "^3.0.2",
     "sharp": "^0.35.4",
     "tsx": "^4.23.13",
