@@ -1,6 +1,6 @@
 # Moving Man
 
-[![CI](https://github.com/OpenPhysics/MovingMan/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenPhysics/MovingMan/actions/workflows/ci.yml)
+[![CI](../../actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
 
 A [SceneryStack](https://scenerystack.org/) port of the PhET **Moving Man** simulation. Explore 1D
 kinematics by dragging the man or using position, velocity, and acceleration controls.
@@ -49,9 +49,9 @@ npm start        # dev server → http://localhost:5173
 
 ## License
 
-GNU Affero General Public License v3.0 — see [OpenPhysics org license](https://github.com/OpenPhysics/.github/blob/main/LICENSE). The original PhET simulation is Copyright © University of Colorado; this is an independent reimplementation.
+GNU Affero General Public License v3.0 — see [OpenLyceum org license](https://github.com/OpenLyceum/.github/blob/main/LICENSE). The original PhET simulation is Copyright © University of Colorado; this is an independent reimplementation.
 
 ## Contributing
 
-See [OpenPhysics contributing guidelines](https://github.com/OpenPhysics/.github/blob/main/CONTRIBUTING.md).
+See [OpenLyceum contributing guidelines](https://github.com/OpenLyceum/.github/blob/main/CONTRIBUTING.md).
 Report bugs via GitHub Issues; use org issue templates.

@@ -1,6 +1,6 @@
 # CLAUDE.md — Moving Man
 
-Sim-specific context for AI assistants. General SceneryStack guidance: [OpenPhysics/.github/CLAUDE.md](https://github.com/OpenPhysics/.github/blob/main/CLAUDE.md).
+Sim-specific context for AI assistants. General SceneryStack guidance: [OpenLyceum/.github/CLAUDE.md](https://github.com/OpenLyceum/.github/blob/main/CLAUDE.md).
 
 ## Project
 
@@ -44,7 +44,7 @@ Physics for educators: `doc/model.md`. Architecture: `doc/implementation-notes.m
 
 ## Accessibility
 
-Follows the shared [OpenPhysics accessibility convention](https://github.com/OpenPhysics/Baton/blob/main/ACCESSIBILITY.md).
+Follows the shared [OpenLyceum accessibility convention](https://github.com/OpenLyceum/Baton/blob/main/ACCESSIBILITY.md).
 Both screens register the shared `MovingManScreenSummaryContent` (live current-details: the man's
 position/velocity/acceleration + playback state) via the `screenSummaryContent` super-option, and
 order the PDOM through `pdomPlayAreaNode`/`pdomControlAreaNode`. A11y strings live under `a11y` in
